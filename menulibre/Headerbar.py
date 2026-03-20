@@ -88,12 +88,15 @@ class Headerbar(Gtk.HeaderBar):
     def add_end_menu_button(self, icon_name, label, menu):
         image = icons.make_image(icon_name, pixel_size=18)
 
-        button = Gtk.MenuButton.new()
-        button.set_menu_model(menu)
-        button.set_use_popover(True)
+        button = Gtk.Button.new()
         button.set_tooltip_text(label)
         button.add(image)
 
-        self.pack_end(button)
+        popover = Gtk.PopoverMenu.new()
+        popover.bind_model(menu, None)
+        popover.set_relative_to(button)
 
+        button.connect("clicked", lambda _b: popover.popup())
+
+        self.pack_end(button)
         return button
