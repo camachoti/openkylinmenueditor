@@ -522,12 +522,20 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         self.execute_button = headerbar.add_button(
             "media-playback-start-symbolic", _("Test Launcher"))
         self.delete_button = headerbar.add_button(
-            "edit-delete-symbolic", _("Delete..."))
+            "edit-delete-symbolic", _("Delete"))
 
-        app_obj = app or self.get_application()
-        if app_obj is not None and hasattr(app_obj, "menu"):
-            self.app_menu_button = headerbar.add_end_menu_button(
-                "open-menu-symbolic", _("Menu"), app_obj.menu)
+        settings_menu = Gio.Menu()
+        section1 = Gio.Menu()
+        section1.append(_("Parsing Error Log"), "app.bad_files")
+        settings_menu.append_section(None, section1)
+        section2 = Gio.Menu()
+        section2.append(_("Help"), "app.help")
+        section2.append(_("About"), "app.about")
+        section2.append(_("Quit"), "app.quit")
+        settings_menu.append_section(None, section2)
+
+        self.app_menu_button = headerbar.add_end_menu_button(
+            "open-menu-symbolic", _("Menu"), settings_menu)
 
         headerbar.add_search(self.search_box)
 
@@ -746,7 +754,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
         toolbar.add_separator()
 
-        self.delete_button = toolbar.add_button("edit-delete", _("Delete..."))
+        self.delete_button = toolbar.add_button("edit-delete", _("Delete Item"))
 
         separator = toolbar.add_separator()
         separator.set_draw(False)
@@ -1141,7 +1149,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
             # Disable deletion (LP: #1751616)
             self.delete_button.set_sensitive(False)
-            self.delete_button.set_tooltip_text(_("Delete..."))
+            self.delete_button.set_tooltip_text(_("Delete"))
 
     def on_search_cleared(self, widget, event, user_data=None):
         """Generic search cleared callback function."""
@@ -1153,7 +1161,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         # Since the filename has changed, check if it is now writable...
         if filename is None or os.access(filename, os.W_OK):
             self.delete_button.set_sensitive(True)
-            self.delete_button.set_tooltip_text(_("Delete..."))
+            self.delete_button.set_tooltip_text(_("Delete"))
         else:
             self.delete_button.set_sensitive(False)
             self.delete_button.set_tooltip_text(
