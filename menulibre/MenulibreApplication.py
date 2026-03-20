@@ -92,7 +92,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
         self.use_headerbar = headerbar_pref
         if headerbar_pref:
-            self.configure_headerbar(add_menu, app)
+            self.configure_headerbar(add_menu)
         else:
             self.configure_application_toolbar(add_menu)
 
@@ -503,7 +503,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         settings.connect("notify::gtk-application-prefer-dark-theme",
                          lambda *_: self.configure_css())
 
-    def configure_headerbar(self, add_menu, app=None):
+    def configure_headerbar(self, add_menu):
         # Configure the Add, Save, Undo, Redo, Revert, Delete widgets.
         headerbar = Headerbar()
 
@@ -522,20 +522,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         self.execute_button = headerbar.add_button(
             "media-playback-start-symbolic", _("Test Launcher"))
         self.delete_button = headerbar.add_button(
-            "edit-delete-symbolic", _("Delete"))
-
-        settings_menu = Gio.Menu()
-        section1 = Gio.Menu()
-        section1.append(_("Parsing Error Log"), "app.bad_files")
-        settings_menu.append_section(None, section1)
-        section2 = Gio.Menu()
-        section2.append(_("Help"), "app.help")
-        section2.append(_("About"), "app.about")
-        section2.append(_("Quit"), "app.quit")
-        settings_menu.append_section(None, section2)
-
-        self.app_menu_button = headerbar.add_end_menu_button(
-            "open-menu-symbolic", _("Menu"), settings_menu)
+            "edit-delete-symbolic", _("Delete..."))
 
         headerbar.add_search(self.search_box)
 
@@ -1885,6 +1872,8 @@ class Application(Gtk.Application):
         section_2_menu.append(_("About"), "app.about")
         section_2_menu.append(_("Quit"), "app.quit")
         self.menu.append_section(None, section_2_menu)
+
+        self.set_app_menu(self.menu)
 
         # Bad desktop files detection on demand
         bad_files_action = Gio.SimpleAction.new("bad_files", None)
