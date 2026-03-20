@@ -92,7 +92,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
         self.use_headerbar = headerbar_pref
         if headerbar_pref:
-            self.configure_headerbar(add_menu)
+            self.configure_headerbar(add_menu, app)
         else:
             self.configure_application_toolbar(add_menu)
 
@@ -503,7 +503,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         settings.connect("notify::gtk-application-prefer-dark-theme",
                          lambda *_: self.configure_css())
 
-    def configure_headerbar(self, add_menu):
+    def configure_headerbar(self, add_menu, app=None):
         # Configure the Add, Save, Undo, Redo, Revert, Delete widgets.
         headerbar = Headerbar()
 
@@ -524,10 +524,10 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         self.delete_button = headerbar.add_button(
             "edit-delete-symbolic", _("Delete..."))
 
-        app = self.get_application()
-        if app is not None and hasattr(app, "menu"):
+        app_obj = app or self.get_application()
+        if app_obj is not None and hasattr(app_obj, "menu"):
             self.app_menu_button = headerbar.add_end_menu_button(
-                "open-menu-symbolic", _("Menu"), app.menu)
+                "open-menu-symbolic", _("Menu"), app_obj.menu)
 
         headerbar.add_search(self.search_box)
 
