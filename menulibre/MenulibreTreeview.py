@@ -21,7 +21,7 @@ import subprocess
 
 from locale import gettext as _
 
-from gi.repository import Gio, GObject, Gtk, Pango, GLib  # type: ignore
+from gi.repository import Gio, GObject, Gtk, Gdk, Pango, GLib  # type: ignore
 
 from . import MenuEditor, MenulibreXdg, XmlMenuElementTree, util
 from .util import MenuItemTypes, check_keypress, getBasename, getRelativeName, escapeText
@@ -495,6 +495,28 @@ class Treeview(Gtk.Box):
         separator = treestore[treeiter][MenuEditor.COL_TYPE] == MenuItemTypes.SEPARATOR  # type: ignore
         renderer.set_property("sensitive", not separator)
         renderer.set_property("style-set", True)
+
+        # Force text color based on selection state so markup never overrides
+        path = treestore.get_path(treeiter)
+        is_selected = self._treeview.get_selection().path_is_selected(path)
+        if is_selected:
+            is_dark = self._is_dark_mode()
+            color = Gdk.RGBA()
+            color.parse("#ffffff" if is_dark else "#1a1a1a")
+            renderer.set_property("foreground-rgba", color)
+            renderer.set_property("foreground-set", True)
+        else:
+            renderer.set_property("foreground-set", False)
+
+    def _is_dark_mode(self):
+        settings = Gtk.Settings.get_default()
+        if settings is None:
+            return False
+        if settings.get_property("gtk-application-prefer-dark-theme"):
+            return True
+        theme = settings.get_property("gtk-theme-name") or ""
+        lower = theme.lower()
+        return lower.endswith("-dark") or lower.endswith(":dark") or "-dark-" in lower
 
     def _icon_name_func(self, col, renderer, treestore, treeiter, user_data):
         """CellRenderer function to set the gicon for each row."""
