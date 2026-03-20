@@ -55,7 +55,7 @@ class Treeview(Gtk.Box):
         self.set_size_request(220, -1)
 
         scrolled = Gtk.ScrolledWindow.new(hadjustment=None, vadjustment=None)
-        scrolled.set_shadow_type(Gtk.ShadowType.IN)
+        scrolled.set_shadow_type(Gtk.ShadowType.NONE)
         scrolled.set_name("MenulibreSidebarScroll")
         self.pack_start(scrolled, True, True, 0)
 
@@ -498,10 +498,13 @@ class Treeview(Gtk.Box):
 
     def _icon_name_func(self, col, renderer, treestore, treeiter, user_data):
         """CellRenderer function to set the gicon for each row."""
-        renderer.set_property("gicon",
-                              treestore[treeiter][MenuEditor.COL_G_ICON])
-        separator = treestore[treeiter][MenuEditor.COL_TYPE] == MenuItemTypes.SEPARATOR  # type: ignore
-        renderer.set_property("sensitive", not separator)
+        item_type = treestore[treeiter][MenuEditor.COL_TYPE]  # type: ignore
+        hide_icon = item_type in (MenuItemTypes.SEPARATOR, MenuItemTypes.DIRECTORY)  # type: ignore
+        renderer.set_property("visible", not hide_icon)
+        if not hide_icon:
+            renderer.set_property("gicon",
+                                  treestore[treeiter][MenuEditor.COL_G_ICON])
+        renderer.set_property("sensitive", item_type != MenuItemTypes.SEPARATOR)  # type: ignore
 
     def _get_selected_iter(self):
         """Return the current treeview model and selected iter."""
