@@ -524,6 +524,11 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         self.delete_button = headerbar.add_button(
             "edit-delete-symbolic", _("Delete..."))
 
+        app = self.get_application()
+        if app is not None and hasattr(app, "menu"):
+            self.app_menu_button = headerbar.add_end_menu_button(
+                "open-menu-symbolic", _("Menu"), app.menu)
+
         headerbar.add_search(self.search_box)
 
         self.set_titlebar(headerbar)
@@ -1872,8 +1877,6 @@ class Application(Gtk.Application):
         section_2_menu.append(_("About"), "app.about")
         section_2_menu.append(_("Quit"), "app.quit")
         self.menu.append_section(None, section_2_menu)
-
-        self.set_app_menu(self.menu)
 
         # Bad desktop files detection on demand
         bad_files_action = Gio.SimpleAction.new("bad_files", None)

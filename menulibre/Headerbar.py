@@ -19,6 +19,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk  # type: ignore
 
+from . import icons
+
 
 class Headerbar(Gtk.HeaderBar):
 
@@ -30,9 +32,7 @@ class Headerbar(Gtk.HeaderBar):
         self.set_show_close_button(True)
 
     def add_menu_button(self, icon_name, label, menu):
-        image = Gtk.Image.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON)
-        image.set_pixel_size(16)
-        image.set_property('use-fallback', True)
+        image = icons.make_image(icon_name, pixel_size=18)
 
         button = Gtk.MenuButton.new()
         button.set_menu_model(menu)
@@ -45,12 +45,11 @@ class Headerbar(Gtk.HeaderBar):
         return button
 
     def add_button(self, icon_name, label):
-        item = Gtk.Button.new_from_icon_name(icon_name, Gtk.IconSize.BUTTON)
-        item.set_tooltip_text(label)
+        image = icons.make_image(icon_name, pixel_size=18)
 
-        image = item.get_image()
-        if image is not None:
-            image.set_property('use-fallback', True)
+        item = Gtk.Button.new()
+        item.set_tooltip_text(label)
+        item.add(image)
 
         self.add(item)
 
@@ -65,12 +64,10 @@ class Headerbar(Gtk.HeaderBar):
         items = []
 
         for icon_name, label in button_specs:
-            item = Gtk.Button.new_from_icon_name(
-                icon_name, Gtk.IconSize.BUTTON)
+            image = icons.make_image(icon_name, pixel_size=18)
+            item = Gtk.Button.new()
             item.set_tooltip_text(label)
-            image = item.get_image()
-            if image is not None:
-                image.set_property('use-fallback', True)
+            item.add(image)
             box.add(item)
             items.append(item)
 
@@ -87,3 +84,16 @@ class Headerbar(Gtk.HeaderBar):
         self.pack_end(box)
 
         return box
+
+    def add_end_menu_button(self, icon_name, label, menu):
+        image = icons.make_image(icon_name, pixel_size=18)
+
+        button = Gtk.MenuButton.new()
+        button.set_menu_model(menu)
+        button.set_use_popover(True)
+        button.set_tooltip_text(label)
+        button.add(image)
+
+        self.pack_end(button)
+
+        return button
