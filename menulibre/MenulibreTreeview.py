@@ -85,7 +85,8 @@ class Treeview(Gtk.Box):
         col.pack_start(col_cell_text, True)
 
         # Set the markup property on the Text cell.
-        col.add_attribute(col_cell_text, "markup", MenuEditor.COL_DISPLAY_NAME)
+        # Removed add_attribute here — markup is built fully in _text_display_func
+        # col.add_attribute(col_cell_text, "markup", MenuEditor.COL_DISPLAY_NAME)
 
         # Add the cell data func for the text column to render labels.
         col.set_cell_data_func(col_cell_text, self._text_display_func, None)
@@ -486,27 +487,28 @@ class Treeview(Gtk.Box):
 
     def _text_display_func(self, col, renderer, treestore, treeiter,
                            user_data):
-        """CellRenderer function to set the gicon for each row."""
+        """CellRenderer function to set markup and text color for each row."""
+        name = treestore[treeiter][MenuEditor.COL_DISPLAY_NAME] or ""
         show = treestore[treeiter][MenuEditor.COL_SHOW]
-        if show:
-            renderer.set_property("style", Pango.Style.NORMAL)
-        else:
-            renderer.set_property("style", Pango.Style.ITALIC)
         separator = treestore[treeiter][MenuEditor.COL_TYPE] == MenuItemTypes.SEPARATOR  # type: ignore
-        renderer.set_property("sensitive", not separator)
-        renderer.set_property("style-set", True)
 
-        # Force text color based on selection state so markup never overrides
+        # Determine if this row is selected
         path = treestore.get_path(treeiter)
         is_selected = self._treeview.get_selection().path_is_selected(path)
+
         if is_selected:
-            is_dark = self._is_dark_mode()
-            color = Gdk.RGBA()
-            color.parse("#ffffff" if is_dark else "#1a1a1a")
-            renderer.set_property("foreground-rgba", color)
-            renderer.set_property("foreground-set", True)
+            fg = "#ffffff" if self._is_dark_mode() else "#1a1a1a"
+            style = "italic" if not show else "normal"
+            markup = '<span foreground="{}" style="{}">{}</span>'.format(
+                fg, style, name)
         else:
-            renderer.set_property("foreground-set", False)
+            if show:
+                markup = name
+            else:
+                markup = '<span style="italic">{}</span>'.format(name)
+
+        renderer.set_property("markup", markup)
+        renderer.set_property("sensitive", not separator)
 
     def _is_dark_mode(self):
         settings = Gtk.Settings.get_default()
