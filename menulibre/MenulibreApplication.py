@@ -302,6 +302,8 @@ class MenulibreWindow(Gtk.ApplicationWindow):
             bg_toolbar  = "#242424"
             bg_card     = "#2a2a2a"
             border_card = "rgba(255,255,255,0.08)"
+            sel_bg      = "rgba(52, 132, 240, 0.35)"
+            sel_fg      = "#ffffff"
         else:
             # Light palette (original openKylin-inspired)
             bg_window   = "#eaebed"
@@ -309,6 +311,8 @@ class MenulibreWindow(Gtk.ApplicationWindow):
             bg_toolbar  = "#f2f3f5"
             bg_card     = "@theme_base_color"
             border_card = "alpha(@borders, 0.55)"
+            sel_bg      = "rgba(52, 132, 240, 0.18)"
+            sel_fg      = "#1a1a1a"
 
         css = """
         /* ============================================================
@@ -359,8 +363,8 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
         #MenulibreSidebarScroll treeview row:selected,
         #MenulibreSidebarScroll treeview row:selected:focus {{
-            background-color: @theme_selected_bg_color;
-            color: @theme_selected_fg_color;
+            background-color: {sel_bg};
+            color: {sel_fg};
             border-radius: 6px;
         }}
 
@@ -475,6 +479,8 @@ class MenulibreWindow(Gtk.ApplicationWindow):
             bg_toolbar=bg_toolbar,
             bg_card=bg_card,
             border_card=border_card,
+            sel_bg=sel_bg,
+            sel_fg=sel_fg,
         )
 
         style_provider = Gtk.CssProvider.new()
