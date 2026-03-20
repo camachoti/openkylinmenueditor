@@ -42,25 +42,34 @@ class ApplicationEditor(Gtk.Box):
 
     def __init__(self, use_headerbar):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        self.set_name("MenulibreEditor")
         self._directory_hide_widgets = []
         self._internal_values = {
             'Type': '',
             'Version': ''
         }
 
-        self.set_border_width(6)
+        self.set_border_width(12)
         self.set_size_request(400, -1)
 
         scrolled = Gtk.ScrolledWindow.new(hadjustment=None, vadjustment=None)
         scrolled.set_shadow_type(Gtk.ShadowType.NONE)
+        scrolled.set_name("MenulibreEditorScroll")
         self.pack_start(scrolled, True, True, 0)
 
-        vbox = Gtk.Box.new(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        vbox = Gtk.Box.new(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        vbox.set_border_width(2)
+        vbox.set_name("MenulibreEditorContent")
         scrolled.add(vbox)
 
-        # Icon, Name, and Comment Entry
+        # Icon, Name, and Comment Entry — wrapped as a card
         hbox = Gtk.Box.new(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        vbox.add(hbox)
+        hbox.set_border_width(10)
+
+        header_card = Gtk.EventBox.new()
+        header_card.get_style_context().add_class("menulibre-card")
+        header_card.add(hbox)
+        vbox.add(header_card)
 
         self._icon_entry = IconEntry(use_headerbar=use_headerbar)
         self._icon_entry.connect("value-changed", self._on_changed)
@@ -199,6 +208,7 @@ class ApplicationEditor(Gtk.Box):
 
         # Filename
         self._filename_label = FilenameLabel()
+        self._filename_label.set_name("MenulibreFilenameBar")
         self._filename_label.connect("value-changed", self._on_changed)
         vbox.pack_end(self._filename_label, False, False, 0)
 

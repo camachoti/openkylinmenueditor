@@ -316,7 +316,8 @@ class MenulibreWindow(Gtk.ApplicationWindow):
          * ============================================================ */
 
         /* === Window background (content area color) === */
-        #MenulibreWindow {{
+        #MenulibreWindow,
+        #MenulibreEditor {{
             background-color: {bg_window};
         }}
 
@@ -372,7 +373,9 @@ class MenulibreWindow(Gtk.ApplicationWindow):
 
         /* === Content area (editor) scroll viewport === */
         #MenulibreEditorScroll,
-        #MenulibreEditorScroll viewport {{
+        #MenulibreEditorScroll viewport,
+        #MenulibreEditorContent,
+        #MenulibreFilenameBar {{
             background-color: {bg_window};
             border: none;
         }}
