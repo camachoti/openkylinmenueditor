@@ -246,6 +246,7 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         # Initialize the GtkApplicationWindow.
         Gtk.Window.__init__(self, title=window_title, application=app)
         self.set_wmclass(window_title, "MenuLibre")
+        self.set_name("MenulibreWindow")
 
         # Restore the window properties.
         self.set_title("MenuLibre")
@@ -270,32 +271,208 @@ class MenulibreWindow(Gtk.ApplicationWindow):
         self.connect('key-press-event', self.on_window_keypress_event)
         self.connect('delete-event', self.on_window_delete_event)
 
+    def _is_dark_mode(self):
+        """Return True if the system is currently using a dark GTK theme."""
+        settings = Gtk.Settings.get_default()
+        if settings is None:
+            return False
+        if settings.get_property("gtk-application-prefer-dark-theme"):
+            return True
+        theme_name = settings.get_property("gtk-theme-name") or ""
+        lower = theme_name.lower()
+        return lower.endswith("-dark") or lower.endswith(":dark") or "-dark-" in lower
+
     def configure_css(self):
         screen = Gdk.Screen.get_default()
         if screen is None:
             return
 
+        # Remove previous provider if present
+        old_provider = getattr(self, "_css_provider", None)
+        if old_provider is not None:
+            Gtk.StyleContext.remove_provider_for_screen(screen, old_provider)
+            self._css_provider = None
+
+        dark = self._is_dark_mode()
+
+        if dark:
+            # Dark palette inspired by GNOME Settings dark mode
+            bg_window   = "#1c1c1c"
+            bg_sidebar  = "#242424"
+            bg_toolbar  = "#242424"
+            bg_card     = "#2a2a2a"
+            border_card = "rgba(255,255,255,0.08)"
+        else:
+            # Light palette (original openKylin-inspired)
+            bg_window   = "#eaebed"
+            bg_sidebar  = "#f2f3f5"
+            bg_toolbar  = "#f2f3f5"
+            bg_card     = "@theme_base_color"
+            border_card = "alpha(@borders, 0.55)"
+
         css = """
-        #MenulibreSidebarToolbar {
+        /* ============================================================
+         * openKylin-inspired layout — auto dark/light
+         * ============================================================ */
+
+        /* === Window background (content area color) === */
+        #MenulibreWindow {{
+            background-color: {bg_window};
+        }}
+
+        /* === Sidebar background === */
+        #MenulibreSidebarScroll,
+        #MenulibreSidebarScroll viewport,
+        #MenulibreSidebarScroll treeview {{
+            background-color: {bg_sidebar};
+            border: none;
+        }}
+
+        /* Remove any frame border on the sidebar scroll */
+        #MenulibreSidebarScroll.frame {{
+            border-left-width: 0;
+            border-right-width: 0;
+        }}
+
+        /* === Sidebar bottom toolbar === */
+        #MenulibreSidebarToolbar {{
+            background-color: {bg_sidebar};
             border-left-width: 0;
             border-right-width: 0;
             border-bottom-width: 0;
             border-radius: 0;
-        }
-        #MenulibreSidebarScroll.frame {
-            border-left-width: 0;
-            border-right-width: 0;
-        }
-        #helpbutton {
+            border-top: 1px solid alpha(@borders, 0.5);
+        }}
+
+        /* === Treeview rows: more height, no grid lines === */
+        #MenulibreSidebarScroll treeview {{
+            -GtkTreeView-grid-line-width: 0;
+            -GtkTreeView-tree-line-width: 1;
+        }}
+
+        #MenulibreSidebarScroll treeview row {{
+            min-height: 36px;
+            padding: 2px 6px;
+            border-radius: 6px;
+        }}
+
+        #MenulibreSidebarScroll treeview row:selected,
+        #MenulibreSidebarScroll treeview row:selected:focus {{
+            background-color: @theme_selected_bg_color;
+            color: @theme_selected_fg_color;
+            border-radius: 6px;
+        }}
+
+        /* === Pane separator: slim, theme-colored === */
+        paned > separator {{
+            background-color: alpha(@borders, 0.6);
+            min-width: 1px;
+            min-height: 1px;
+        }}
+
+        /* === Content area (editor) scroll viewport === */
+        #MenulibreEditorScroll,
+        #MenulibreEditorScroll viewport {{
+            background-color: {bg_window};
+            border: none;
+        }}
+
+        /* === Cards (Section frames + header EventBox) === */
+        .menulibre-card {{
+            background-color: {bg_card};
+            border-radius: 10px;
+            border: 1px solid {border_card};
+        }}
+
+        /* Section frame label (bold title inside card) */
+        .menulibre-card > label {{
+            margin: 2px 4px;
+        }}
+
+        /* === Primary toolbar === */
+        .primary-toolbar {{
+            background-color: {bg_toolbar};
+            border-bottom: 1px solid alpha(@borders, 0.5);
+        }}
+
+        /* === Inline toolbars === */
+        .inline-toolbar {{
+            background-color: {bg_toolbar};
+            border-color: alpha(@borders, 0.5);
+            border-radius: 0;
+        }}
+
+        /* === Help button === */
+        #helpbutton {{
             padding: 0;
-        }
-        #hideybutton {
+            border-radius: 4px;
+            min-height: 24px;
+            min-width: 24px;
+        }}
+
+        /* === Sidebar hide/show button === */
+        #hideybutton {{
             padding: 0;
             border-radius: 0;
             min-height: 18px;
             min-width: 18px;
-        }
-        """
+        }}
+
+        /* === Modern headerbar buttons === */
+        headerbar button,
+        headerbar menubutton button {{
+            border-radius: 6px;
+            padding: 4px 6px;
+            border: 1px solid transparent;
+            transition: background-color 150ms ease,
+                        border-color 150ms ease;
+            min-height: 28px;
+            min-width: 28px;
+        }}
+        headerbar button:hover,
+        headerbar menubutton button:hover {{
+            background-color: alpha(@theme_selected_bg_color, 0.12);
+            border-color: alpha(@theme_selected_bg_color, 0.25);
+        }}
+        headerbar button:active,
+        headerbar menubutton button:active {{
+            background-color: alpha(@theme_selected_bg_color, 0.22);
+        }}
+
+        /* Linked group (Undo/Redo) */
+        headerbar .linked > button:first-child {{ border-radius: 6px 0 0 6px; }}
+        headerbar .linked > button:last-child  {{ border-radius: 0 6px 6px 0; }}
+        headerbar .linked > button:only-child  {{ border-radius: 6px; }}
+        headerbar .linked > button             {{ border-right-width: 0; }}
+        headerbar .linked > button:last-child  {{ border-right-width: 1px; }}
+
+        /* === Modern primary toolbar buttons === */
+        .primary-toolbar toolbutton > button,
+        .primary-toolbar button.toolbutton {{
+            border-radius: 6px;
+            padding: 4px 6px;
+            border: 1px solid transparent;
+            transition: background-color 150ms ease,
+                        border-color 150ms ease;
+            min-height: 30px;
+            min-width: 30px;
+        }}
+        .primary-toolbar toolbutton > button:hover,
+        .primary-toolbar button.toolbutton:hover {{
+            background-color: alpha(@theme_selected_bg_color, 0.12);
+            border-color: alpha(@theme_selected_bg_color, 0.25);
+        }}
+        .primary-toolbar toolbutton > button:active,
+        .primary-toolbar button.toolbutton:active {{
+            background-color: alpha(@theme_selected_bg_color, 0.22);
+        }}
+        """.format(
+            bg_window=bg_window,
+            bg_sidebar=bg_sidebar,
+            bg_toolbar=bg_toolbar,
+            bg_card=bg_card,
+            border_card=border_card,
+        )
 
         style_provider = Gtk.CssProvider.new()
         style_provider.load_from_data(bytes(css.encode()))
@@ -304,6 +481,24 @@ class MenulibreWindow(Gtk.ApplicationWindow):
             screen, style_provider,
             Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
         )
+        self._css_provider = style_provider
+
+        self._connect_theme_change()
+
+    def _connect_theme_change(self):
+        """Connect GTK theme-change signals (once only) to re-apply CSS."""
+        settings = Gtk.Settings.get_default()
+        if settings is None:
+            return
+
+        if getattr(self, "_theme_change_connected", False):
+            return
+        self._theme_change_connected = True
+
+        settings.connect("notify::gtk-theme-name",
+                         lambda *_: self.configure_css())
+        settings.connect("notify::gtk-application-prefer-dark-theme",
+                         lambda *_: self.configure_css())
 
     def configure_headerbar(self, add_menu):
         # Configure the Add, Save, Undo, Redo, Revert, Delete widgets.
