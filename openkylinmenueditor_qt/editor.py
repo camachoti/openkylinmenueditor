@@ -149,13 +149,13 @@ class ApplicationEditor(QWidget):
         font.setPointSize(font.pointSize() + 2)
         self._name_edit.setFont(font)
         self._name_edit.textEdited.connect(
-            lambda t: self._on_changed(None, 'Name', t))
+            lambda t: self._on_changed('Name', t))
         name_box.addWidget(self._name_edit)
 
         self._comment_edit = QLineEdit()
         self._comment_edit.setPlaceholderText(_('Short description'))
         self._comment_edit.textEdited.connect(
-            lambda t: self._on_changed(None, 'Comment', t))
+            lambda t: self._on_changed('Comment', t))
         name_box.addWidget(self._comment_edit)
         header_layout.addLayout(name_box)
 
@@ -340,5 +340,5 @@ class ApplicationEditor(QWidget):
 
     # ------------------------------------------------------------------
 
-    def _on_changed(self, _widget_or_none, key: str, value: str):
+    def _on_changed(self, key: str, value: str):
         self.value_changed.emit(key, value)

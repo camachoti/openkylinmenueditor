@@ -205,6 +205,8 @@ def getCurrentDesktop():
     for desktop in ["budgie", "pantheon", "gnome"]:
         if desktop in current_desktop:
             return desktop
+    if "ukui" in current_desktop:
+        return "plasma"  # UKUI uses kf5 menus
     if "kde" in current_desktop:
         kde_version = int(os.environ.get("KDE_SESSION_VERSION", "4"))
         if kde_version >= 5:
