@@ -74,7 +74,6 @@ class _IconBrowser(QDialog):
 
     def _load_icons(self):
         # Collect icon names from known categories
-        from PyQt5.QtGui import QIconEnginePlugin
         import subprocess
         try:
             # Use the GTK icon theme list if available, otherwise fallback
