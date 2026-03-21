@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QFont, QIcon
+from .icons import get_icon
 
 from .icon_entry import IconEntry
 from .action_editor import ActionEditor
@@ -259,7 +260,7 @@ class ApplicationEditor(QWidget):
             Qt.TextSelectableByMouse)
         filename_layout.addWidget(self._filename_label)
 
-        copy_btn = QPushButton(QIcon.fromTheme('edit-copy'), '')
+        copy_btn = QPushButton(get_icon('edit-copy'), '')
         copy_btn.setToolTip(_('Copy path to clipboard'))
         copy_btn.setFlat(True)
         copy_btn.setFixedSize(24, 24)

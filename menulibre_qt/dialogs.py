@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QDialog, QDialogButtonBox, QVBoxLayout,
                               QMessageBox)
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import Qt
+from .icons import get_icon
 
 import menulibre_lib
 
@@ -25,8 +26,7 @@ class AboutDialog(QDialog):
 
         # Logo
         logo_label = QLabel()
-        icon = QIcon.fromTheme('kylinmenueditor',
-                               QIcon.fromTheme('preferences-system-windows'))
+        icon = get_icon('kylinmenueditor')
         logo_label.setPixmap(icon.pixmap(64, 64))
         logo_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(logo_label)

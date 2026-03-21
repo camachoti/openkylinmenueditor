@@ -18,6 +18,7 @@ from PyQt5.QtGui import QIcon, QStandardItemModel, QStandardItem
 from PyQt5.QtCore import (
     Qt, pyqtSignal, QSortFilterProxyModel, QModelIndex, QSize
 )
+from .icons import get_icon
 
 from .menu_model import (
     ROLE_TYPE, ROLE_FILENAME, ROLE_SHOW, ROLE_ICON_NAME,
@@ -101,39 +102,39 @@ class Treeview(QWidget):
         self._toolbar.setMovable(False)
 
         self._act_add_launcher = self._toolbar.addAction(
-            QIcon.fromTheme('list-add'), _('Add Launcher'))
+            get_icon('list-add'), _('Add Launcher'))
         self._act_add_launcher.triggered.connect(self.add_launcher_requested)
 
         self._act_add_dir = self._toolbar.addAction(
-            QIcon.fromTheme('folder-new'), _('Add Directory'))
+            get_icon('folder-new'), _('Add Directory'))
         self._act_add_dir.triggered.connect(self.add_directory_requested)
 
         self._act_add_sep = self._toolbar.addAction(
-            QIcon.fromTheme('list-add'), _('Add Separator'))
+            get_icon('list-add'), _('Add Separator'))
         self._act_add_sep.triggered.connect(self.add_separator_requested)
 
         self._act_remove = self._toolbar.addAction(
-            QIcon.fromTheme('list-remove'), _('Remove'))
+            get_icon('list-remove'), _('Remove'))
         self._act_remove.triggered.connect(self.remove_requested)
 
         self._toolbar.addSeparator()
 
         self._act_move_up = self._toolbar.addAction(
-            QIcon.fromTheme('go-up'), _('Move Up'))
+            get_icon('go-up'), _('Move Up'))
         self._act_move_up.triggered.connect(self._move_up)
 
         self._act_move_down = self._toolbar.addAction(
-            QIcon.fromTheme('go-down'), _('Move Down'))
+            get_icon('go-down'), _('Move Down'))
         self._act_move_down.triggered.connect(self._move_down)
 
         self._act_sort = self._toolbar.addAction(
-            QIcon.fromTheme('view-sort-ascending'), _('Sort Alphabetically'))
+            get_icon('view-sort-ascending'), _('Sort Alphabetically'))
         self._act_sort.triggered.connect(self._sort_children)
 
         self._toolbar.addSeparator()
 
         self._act_launchers_only = QAction(
-            QIcon.fromTheme('view-list-symbolic'), _('Show Launchers Only'),
+            get_icon('view-list-symbolic'), _('Show Launchers Only'),
             self._toolbar)
         self._act_launchers_only.setCheckable(True)
         self._act_launchers_only.toggled.connect(self._on_launchers_only_toggled)

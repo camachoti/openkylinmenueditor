@@ -19,6 +19,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtCore import Qt, QSize, pyqtSlot
+from .icons import get_icon
 
 from .treeview import Treeview
 from .toolbar import Toolbar
@@ -36,8 +37,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('KylinMenuEditor')
-        self.setWindowIcon(QIcon.fromTheme('kylinmenueditor',
-                                           QIcon.fromTheme('preferences-system-windows')))
+        self.setWindowIcon(get_icon('kylinmenueditor'))
         self.resize(900, 600)
 
         self._current_filename: str = ''
@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         file_menu = mb.addMenu(_('&File'))
 
         self._act_save = file_menu.addAction(
-            QIcon.fromTheme('document-save'), _('&Save'))
+            get_icon('document-save'), _('&Save'))
         self._act_save.setShortcut(QKeySequence.Save)
         self._act_save.setEnabled(False)
         self._act_save.triggered.connect(self._on_save)
@@ -76,7 +76,7 @@ class MainWindow(QMainWindow):
         file_menu.addSeparator()
 
         act_quit = file_menu.addAction(
-            QIcon.fromTheme('application-exit'), _('&Quit'))
+            get_icon('application-exit'), _('&Quit'))
         act_quit.setShortcut(QKeySequence.Quit)
         act_quit.triggered.connect(self.close)
 
@@ -84,13 +84,13 @@ class MainWindow(QMainWindow):
         edit_menu = mb.addMenu(_('&Edit'))
 
         self._act_undo = edit_menu.addAction(
-            QIcon.fromTheme('edit-undo'), _('&Undo'))
+            get_icon('edit-undo'), _('&Undo'))
         self._act_undo.setShortcut(QKeySequence.Undo)
         self._act_undo.setEnabled(False)
         self._act_undo.triggered.connect(self._on_undo)
 
         self._act_redo = edit_menu.addAction(
-            QIcon.fromTheme('edit-redo'), _('&Redo'))
+            get_icon('edit-redo'), _('&Redo'))
         self._act_redo.setShortcut(QKeySequence.Redo)
         self._act_redo.setEnabled(False)
         self._act_redo.triggered.connect(self._on_redo)
@@ -98,14 +98,14 @@ class MainWindow(QMainWindow):
         edit_menu.addSeparator()
 
         self._act_revert = edit_menu.addAction(
-            QIcon.fromTheme('document-revert'), _('Re&vert'))
+            get_icon('document-revert'), _('Re&vert'))
         self._act_revert.setEnabled(False)
         self._act_revert.triggered.connect(self._on_revert)
 
         edit_menu.addSeparator()
 
         self._act_delete = edit_menu.addAction(
-            QIcon.fromTheme('edit-delete'), _('&Delete'))
+            get_icon('edit-delete'), _('&Delete'))
         self._act_delete.setEnabled(False)
         self._act_delete.triggered.connect(self._on_delete)
 
@@ -113,27 +113,27 @@ class MainWindow(QMainWindow):
         launcher_menu = mb.addMenu(_('&Launcher'))
 
         act_add_launcher = launcher_menu.addAction(
-            QIcon.fromTheme('list-add'), _('Add &Launcher'))
+            get_icon('list-add'), _('Add &Launcher'))
         act_add_launcher.triggered.connect(self._on_add_launcher)
 
         act_add_dir = launcher_menu.addAction(
-            QIcon.fromTheme('folder-new'), _('Add &Directory'))
+            get_icon('folder-new'), _('Add &Directory'))
         act_add_dir.triggered.connect(self._on_add_directory)
 
         act_add_sep = launcher_menu.addAction(
-            QIcon.fromTheme('list-add'), _('Add &Separator'))
+            get_icon('list-add'), _('Add &Separator'))
         act_add_sep.triggered.connect(self._on_add_separator)
 
         launcher_menu.addSeparator()
 
         self._act_execute = launcher_menu.addAction(
-            QIcon.fromTheme('media-playback-start'), _('&Execute'))
+            get_icon('media-playback-start'), _('&Execute'))
         self._act_execute.triggered.connect(self._on_execute)
 
         # Help menu
         help_menu = mb.addMenu(_('&Help'))
         act_about = help_menu.addAction(
-            QIcon.fromTheme('help-about'), _('&About'))
+            get_icon('help-about'), _('&About'))
         act_about.triggered.connect(self._on_about)
 
     def _build_toolbar(self):
@@ -145,16 +145,16 @@ class MainWindow(QMainWindow):
         # Add menu button
         add_menu = QMenu(self)
         add_menu.addAction(
-            QIcon.fromTheme('list-add'), _('Add Launcher'),
+            get_icon('list-add'), _('Add Launcher'),
             self._on_add_launcher)
         add_menu.addAction(
-            QIcon.fromTheme('folder-new'), _('Add Directory'),
+            get_icon('folder-new'), _('Add Directory'),
             self._on_add_directory)
         add_menu.addAction(
-            QIcon.fromTheme('list-add'), _('Add Separator'),
+            get_icon('list-add'), _('Add Separator'),
             self._on_add_separator)
 
-        add_btn = tb.addAction(QIcon.fromTheme('list-add'), _('Add'))
+        add_btn = tb.addAction(get_icon('list-add'), _('Add'))
         add_btn.setMenu(add_menu)
         add_btn.triggered.connect(lambda: add_menu.exec_(
             self.mapToGlobal(self.rect().bottomLeft())))

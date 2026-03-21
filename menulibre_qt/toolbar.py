@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QToolBar, QToolButton, QAction, QMenu,
                               QSizePolicy, QWidget)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt, QSize
+from .icons import get_icon
 
 
 class Toolbar(QToolBar):
@@ -25,7 +26,7 @@ class Toolbar(QToolBar):
                         menu: QMenu) -> QToolButton:
         """Add a QToolButton that shows a drop-down menu."""
         btn = QToolButton(self)
-        btn.setIcon(QIcon.fromTheme(icon_name))
+        btn.setIcon(get_icon(icon_name))
         btn.setText(label)
         btn.setToolTip(label)
         btn.setMenu(menu)
@@ -36,7 +37,7 @@ class Toolbar(QToolBar):
 
     def add_button(self, icon_name: str, label: str) -> QAction:
         """Add a simple icon button and return its QAction."""
-        action = QAction(QIcon.fromTheme(icon_name), label, self)
+        action = QAction(get_icon(icon_name), label, self)
         action.setToolTip(label)
         self.addAction(action)
         return action

@@ -16,6 +16,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QIcon
+from .icons import get_icon
 
 COL_SHOW = 0
 COL_NAME = 1
@@ -60,27 +61,27 @@ class ActionEditor(QWidget):
         tb.setIconSize(QSize(16, 16))
         tb.setMovable(False)
 
-        self._act_add = tb.addAction(QIcon.fromTheme('list-add'), _('Add'))
+        self._act_add = tb.addAction(get_icon('list-add'), _('Add'))
         self._act_add.triggered.connect(self._on_add)
 
         self._act_remove = tb.addAction(
-            QIcon.fromTheme('list-remove'), _('Remove'))
+            get_icon('list-remove'), _('Remove'))
         self._act_remove.triggered.connect(self._on_remove)
         self._act_remove.setEnabled(False)
 
         self._act_clear = tb.addAction(
-            QIcon.fromTheme('edit-clear'), _('Clear'))
+            get_icon('edit-clear'), _('Clear'))
         self._act_clear.triggered.connect(self._on_clear)
         self._act_clear.setEnabled(False)
 
         tb.addSeparator()
 
-        self._act_up = tb.addAction(QIcon.fromTheme('go-up'), _('Move Up'))
+        self._act_up = tb.addAction(get_icon('go-up'), _('Move Up'))
         self._act_up.triggered.connect(self._on_move_up)
         self._act_up.setEnabled(False)
 
         self._act_down = tb.addAction(
-            QIcon.fromTheme('go-down'), _('Move Down'))
+            get_icon('go-down'), _('Move Down'))
         self._act_down.triggered.connect(self._on_move_down)
         self._act_down.setEnabled(False)
 
