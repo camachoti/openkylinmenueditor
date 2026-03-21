@@ -1,0 +1,43 @@
+#!/usr/bin/python3
+# -*- Mode: Python; coding: utf-8; indent-tabs-mode: nil; tab-width: 4 -*-
+#   OpenOpenKylinMenuEditor — fork of MenuLibre
+#   Copyright (C) 2026 Tiago Camacho
+#   Copyright (C) 2012-2024 Sean Davis <sean@bluesabre.org>
+#
+#   This program is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License version 3, as published
+#   by the Free Software Foundation.
+
+import locale
+locale.textdomain('openkylinmenueditor')
+
+import sys
+import os
+import signal
+
+# Get project root directory (enable symlink and trunk execution)
+PROJECT_ROOT_DIRECTORY = os.path.abspath(
+    os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))))
+
+# Add project root directory to python search path
+sys.path.append(PROJECT_ROOT_DIRECTORY)
+
+# Allow application shutdown with Ctrl-C in terminal
+signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# --qt flag selects the new PyQt5 UI (default); --gtk selects legacy GTK UI
+use_qt = '--gtk' not in sys.argv
+
+if use_qt:
+    from openkylinmenueditor_qt.app import run
+    sys.exit(run())
+else:
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk  # type: ignore
+    if Gtk.check_version(3, 10, 0):
+        print("Gtk version too old, version 3.10 required.")
+        sys.exit(1)
+    import openkylinmenueditor
+    openkylinmenueditor.main()
+

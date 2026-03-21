@@ -54,10 +54,10 @@ with open('files.txt', 'r') as filelist:
 
 os.remove('files.txt')
 
-files.append('%s/share/pixmaps/menulibre.png' % target)
+files.append('%s/share/pixmaps/openkylinmenueditor.png' % target)
 for size in ['scalable', '16x16', '24x24', '32x32', '48x48', '64x64']:
     files.append(
-        '%s/share/icons/hicolor/%s/apps/menulibre.svg' %
+        '%s/share/icons/hicolor/%s/apps/openkylinmenueditor.svg' %
         (target, size))
 
 if len(files) == 0:

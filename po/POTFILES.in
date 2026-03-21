@@ -14,40 +14,40 @@
 ### END LICENSE
 
 # Desktop File
-menulibre.desktop.in
+openkylinmenueditor.desktop.in
 
 # Python Files
-menulibre_lib/__init__.py
-menulibre_lib/helpers.py
-menulibre_lib/menulibreconfig.py
-menulibre/__init__.py
-menulibre/ActionEditor.py
-menulibre/AdvancedPage.py
-menulibre/ApplicationEditor.py
-menulibre/CategoryEditor.py
-menulibre/CommandEditor.py
-menulibre/Dialogs.py
-menulibre/FileHandler.py
-menulibre/FilenameLabel.py
-menulibre/Headerbar.py
-menulibre/IconEntry.py
-menulibre/MenuEditor.py
-menulibre/MenulibreApplication.py
-menulibre/MenulibreHistory.py
-menulibre/MenulibreStackSwitcher.py
-menulibre/MenulibreTreeview.py
-menulibre/MenulibreXdg.py
-menulibre/ParsingErrorsDialog.py
-menulibre/PathEntry.py
-menulibre/Section.py
-menulibre/StartupWmClassEntry.py
-menulibre/SwitchEntry.py
-menulibre/TextEntry.py
-menulibre/TextEntryButton.py
-menulibre/Toolbar.py
-menulibre/util.py
-menulibre/XmlMenuElementTree.py
+openkylinmenueditor_lib/__init__.py
+openkylinmenueditor_lib/helpers.py
+openkylinmenueditor_lib/openkylinmenueditorconfig.py
+openkylinmenueditor/__init__.py
+openkylinmenueditor/ActionEditor.py
+openkylinmenueditor/AdvancedPage.py
+openkylinmenueditor/ApplicationEditor.py
+openkylinmenueditor/CategoryEditor.py
+openkylinmenueditor/CommandEditor.py
+openkylinmenueditor/Dialogs.py
+openkylinmenueditor/FileHandler.py
+openkylinmenueditor/FilenameLabel.py
+openkylinmenueditor/Headerbar.py
+openkylinmenueditor/IconEntry.py
+openkylinmenueditor/MenuEditor.py
+openkylinmenueditor/MenulibreApplication.py
+openkylinmenueditor/MenulibreHistory.py
+openkylinmenueditor/MenulibreStackSwitcher.py
+openkylinmenueditor/MenulibreTreeview.py
+openkylinmenueditor/MenulibreXdg.py
+openkylinmenueditor/ParsingErrorsDialog.py
+openkylinmenueditor/PathEntry.py
+openkylinmenueditor/Section.py
+openkylinmenueditor/StartupWmClassEntry.py
+openkylinmenueditor/SwitchEntry.py
+openkylinmenueditor/TextEntry.py
+openkylinmenueditor/TextEntryButton.py
+openkylinmenueditor/Toolbar.py
+openkylinmenueditor/util.py
+openkylinmenueditor/XmlMenuElementTree.py
 setup.py
 
 # XML Files
-[type: gettext/xml]data/metainfo/menulibre.appdata.xml.in
+[type: gettext/xml]data/metainfo/openkylinmenueditor.appdata.xml.in

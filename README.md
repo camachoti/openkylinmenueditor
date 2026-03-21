@@ -1,7 +1,7 @@
 # MenuLibre
 **MenuLibre** is an advanced FreeDesktop.org compliant menu editor.
 
-![MenuLibre window](https://github.com/bluesabre/menulibre/blob/wiki-assets/readme/menulibre-github.png)
+![MenuLibre window](https://github.com/bluesabre/openkylinmenueditor/blob/wiki-assets/readme/openkylinmenueditor-github.png)
 
 All fields specified in the FreeDesktop.org [Desktop Entry](https://specifications.freedesktop.org/desktop-entry-spec/latest/) and [Menu](https://specifications.freedesktop.org/menu-spec/latest/) 
 specifications are available to quickly update.
@@ -42,8 +42,8 @@ used by applications such as Unity and Plank.
     sudo python3 setup.py install
 
 ## Links
- - [Homepage](https://bluesabre.org/menulibre/)
- - [Releases](https://github.com/bluesabre/menulibre/releases)
- - [Bug Reports](https://github.com/bluesabre/menulibre/issues)
- - [Translations](https://www.transifex.com/bluesabreorg/menulibre)
- - [Wiki](https://github.com/bluesabre/menulibre/wiki)
+ - [Homepage](https://bluesabre.org/openkylinmenueditor/)
+ - [Releases](https://github.com/bluesabre/openkylinmenueditor/releases)
+ - [Bug Reports](https://github.com/bluesabre/openkylinmenueditor/issues)
+ - [Translations](https://www.transifex.com/bluesabreorg/openkylinmenueditor)
+ - [Wiki](https://github.com/bluesabre/openkylinmenueditor/wiki)

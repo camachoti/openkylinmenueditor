@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2021-2024 Sean Davis <sean@bluesabre.org> -->
 <component type="desktop">
-  <id>menulibre.desktop</id>
+  <id>openkylinmenueditor.desktop</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>MenuLibre</name>
@@ -29,40 +29,40 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-application-window.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-application-window.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-application-sidebar.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-application-sidebar.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-icon-dialog.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-icon-dialog.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-add-menu.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-add-menu.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-application-search.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-application-search.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-action-editor.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-action-editor.png</image>
     </screenshot>
     <screenshot>
-      <image>https://screenshots.bluesabre.org/menulibre/2.3/menulibre-advanced-editor.png</image>
+      <image>https://screenshots.bluesabre.org/openkylinmenueditor/2.3/openkylinmenueditor-advanced-editor.png</image>
     </screenshot>
   </screenshots>
 
-  <url type="homepage">https://github.com/bluesabre/menulibre</url>
-  <url type="bugtracker">https://github.com/bluesabre/menulibre/issues</url>
-  <url type="help">https://github.com/bluesabre/menulibre/wiki</url>
-  <url type="translate">https://www.transifex.com/bluesabreorg/menulibre</url>
+  <url type="homepage">https://github.com/bluesabre/openkylinmenueditor</url>
+  <url type="bugtracker">https://github.com/bluesabre/openkylinmenueditor/issues</url>
+  <url type="help">https://github.com/bluesabre/openkylinmenueditor/wiki</url>
+  <url type="translate">https://www.transifex.com/bluesabreorg/openkylinmenueditor</url>
   <url type="donation">https://github.com/sponsors/bluesabre</url>
 
   <update_contact>sean@bluesabre.org</update_contact>
 
-  <translation type="gettext">menulibre</translation>
+  <translation type="gettext">openkylinmenueditor</translation>
 
   <provides>
-    <binary>menulibre</binary>
+    <binary>openkylinmenueditor</binary>
   </provides>
 
   <releases>

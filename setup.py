@@ -22,7 +22,7 @@ import sys
 try:
     import DistUtilsExtra.auto
 except ImportError:
-    sys.stderr.write("To build menulibre you need "
+    sys.stderr.write("To build openkylinmenueditor you need "
                      "https://launchpad.net/python-distutils-extra\n")
     sys.exit(1)
 assert DistUtilsExtra.auto.__version__ >= '2.18', \
@@ -31,7 +31,7 @@ assert DistUtilsExtra.auto.__version__ >= '2.18', \
 
 def update_config(libdir, values={}):
     """Update the configuration file at installation time."""
-    filename = os.path.join(libdir, 'menulibre_lib', 'menulibreconfig.py')
+    filename = os.path.join(libdir, 'openkylinmenueditor_lib', 'openkylinmenueditorconfig.py')
     oldvalues = {}
     try:
         fin = open(filename, 'r', encoding='utf-8')
@@ -59,27 +59,27 @@ def move_icon_file(root, target_data, prefix):
     icon_file = None
 
     old_icon_path = os.path.normpath(
-        os.path.join(root, target_data, 'share', 'menulibre', 'media'))
+        os.path.join(root, target_data, 'share', 'openkylinmenueditor', 'media'))
     for icon_size in ['16x16', '24x24', '32x32', '48x48', '64x64', 'scalable',
                       'pixmap']:
-        # Install menulibre.png to share/pixmaps
+        # Install openkylinmenueditor.png to share/pixmaps
         if icon_size == 'pixmap':
-            old_icon_file = os.path.join(old_icon_path, 'menulibre.png')
+            old_icon_file = os.path.join(old_icon_path, 'openkylinmenueditor.png')
             icon_path = os.path.normpath(
                 os.path.join(root, target_data, 'share', 'pixmaps'))
-            icon_file = os.path.join(icon_path, 'menulibre.png')
+            icon_file = os.path.join(icon_path, 'openkylinmenueditor.png')
         # Install everything else to share/icons/hicolor
         else:
             if icon_size == 'scalable':
-                old_icon_file = os.path.join(old_icon_path, 'menulibre.svg')
+                old_icon_file = os.path.join(old_icon_path, 'openkylinmenueditor.svg')
             else:
                 old_icon_file = os.path.join(old_icon_path,
-                                             'menulibre_%s.svg' %
+                                             'openkylinmenueditor_%s.svg' %
                                              icon_size.split('x')[0])
             icon_path = os.path.normpath(
                 os.path.join(root, target_data, 'share', 'icons',
                              'hicolor', icon_size, 'apps'))
-            icon_file = os.path.join(icon_path, 'menulibre.svg')
+            icon_file = os.path.join(icon_path, 'openkylinmenueditor.svg')
 
         # Get the real paths.
         old_icon_file = os.path.realpath(old_icon_file)
@@ -104,8 +104,8 @@ def move_icon_file(root, target_data, prefix):
 
 def remove_appdata_in_file(root, target_data):
     metainfo = os.path.normpath(
-        os.path.join(root, target_data, 'share', 'menulibre', 'metainfo'))
-    appdata_in = os.path.join(metainfo, 'menulibre.appdata.xml.in')
+        os.path.join(root, target_data, 'share', 'openkylinmenueditor', 'metainfo'))
+    appdata_in = os.path.join(metainfo, 'openkylinmenueditor.appdata.xml.in')
     os.remove(appdata_in)
     os.rmdir(metainfo)
 
@@ -113,7 +113,7 @@ def remove_appdata_in_file(root, target_data):
 def remove_empty_data_directory(root, target_data):
     """Remove to no-longer-needed data directory."""
     old_data_path = os.path.normpath(
-        os.path.join(root, target_data, 'share', 'menulibre'))
+        os.path.join(root, target_data, 'share', 'openkylinmenueditor'))
 
     # Media is now empty
     if len(os.listdir(old_data_path)) == 0:
@@ -125,7 +125,7 @@ def get_desktop_file(root, target_data, prefix):
     """Move the desktop file to its installation prefix."""
     desktop_path = os.path.realpath(
         os.path.join(root, target_data, 'share', 'applications'))
-    desktop_file = os.path.join(desktop_path, 'menulibre.desktop')
+    desktop_file = os.path.join(desktop_path, 'openkylinmenueditor.desktop')
     return desktop_file
 
 
@@ -138,7 +138,7 @@ def update_desktop_file(filename, script_path):
         for line in fin:
             if 'Exec=' in line:
                 cmd = line.split("=")[1].split(None, 1)
-                line = "Exec=%s" % os.path.join(script_path, 'menulibre')
+                line = "Exec=%s" % os.path.join(script_path, 'openkylinmenueditor')
                 if len(cmd) > 1:
                     line += " %s" % cmd[1].strip()  # Add script arguments back
                 line += "\n"
@@ -178,7 +178,7 @@ def write_appdata_file(filename_in):
 
 
 # Update AppData with latest translations first.
-write_appdata_file("data/metainfo/menulibre.appdata.xml.in")
+write_appdata_file("data/metainfo/openkylinmenueditor.appdata.xml.in")
 
 
 class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
@@ -200,17 +200,17 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
         if self.root:
             target_data = os.path.relpath(self.install_data, self.root) + \
                 os.sep
-            target_pkgdata = os.path.join(target_data, 'share', 'menulibre',
+            target_pkgdata = os.path.join(target_data, 'share', 'openkylinmenueditor',
                                           '')
             target_scripts = os.path.join(self.install_scripts, '')
 
-            data_dir = os.path.join(self.prefix, 'share', 'menulibre', '')
+            data_dir = os.path.join(self.prefix, 'share', 'openkylinmenueditor', '')
             script_path = os.path.join(self.prefix, 'bin')
         else:
             # --user install
             self.root = ''
             target_data = os.path.relpath(self.install_data) + os.sep
-            target_pkgdata = os.path.join(target_data, 'share', 'menulibre',
+            target_pkgdata = os.path.join(target_data, 'share', 'openkylinmenueditor',
                                           '')
             target_scripts = os.path.join(self.install_scripts, '')
 
@@ -230,7 +230,7 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
         print(("Target Scripts: %s\n" % target_scripts))
         print(("MenuLibre Data Directory: %s" % data_dir))
 
-        values = {'__menulibre_data_directory__': "'%s'" % (data_dir),
+        values = {'__openkylinmenueditor_data_directory__': "'%s'" % (data_dir),
                   '__version__': "'%s'" % self.distribution.get_version()}
         update_config(self.install_lib, values)
 
@@ -243,7 +243,7 @@ class InstallAndUpdateDataDirectory(DistUtilsExtra.auto.install_auto):
 
 
 DistUtilsExtra.auto.setup(
-    name='menulibre',
+    name='openkylinmenueditor',
     version='2.4.0',
     license='GPL-3',
     author='Sean Davis',
@@ -252,9 +252,9 @@ DistUtilsExtra.auto.setup(
     long_description='An advanced menu editor that provides modern features '
                      'and full Unity action support. Suitable for lightweight '
                      'desktop environments.',
-    url='https://github.com/bluesabre/menulibre',
-    data_files=[('share/man/man1', ['menulibre.1',
-                                    'menulibre-menu-validate.1']),
-                ('share/metainfo/', ['data/metainfo/menulibre.appdata.xml'])],
+    url='https://github.com/bluesabre/openkylinmenueditor',
+    data_files=[('share/man/man1', ['openkylinmenueditor.1',
+                                    'openkylinmenueditor-menu-validate.1']),
+                ('share/metainfo/', ['data/metainfo/openkylinmenueditor.appdata.xml'])],
     cmdclass={'install': InstallAndUpdateDataDirectory}
 )

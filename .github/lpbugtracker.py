@@ -18,10 +18,10 @@ log = logging.getLogger("lpbugtracker")
 log.setLevel(logging.DEBUG)
 
 GH_OWNER = "bluesabre"
-GH_REPO = "menulibre"
+GH_REPO = "openkylinmenueditor"
 
-LP_SOURCE_NAME = "menulibre"
-LP_SOURCE_URL_NAME = "menulibre"
+LP_SOURCE_NAME = "openkylinmenueditor"
+LP_SOURCE_URL_NAME = "openkylinmenueditor"
 
 HOME = os.path.expanduser("~")
 CACHEDIR = os.path.join(HOME, ".launchpadlib", "cache")
