@@ -27,9 +27,30 @@ import shutil
 
 from locale import gettext as _
 
-import gi
-gi.require_version('Gdk', '3.0')
-from gi.repository import GLib, Gdk  # type: ignore
+import html
+import shlex
+
+
+def _xdg_user_data_dir():
+    return os.environ.get('XDG_DATA_HOME',
+                          os.path.expanduser('~/.local/share'))
+
+
+def _xdg_user_config_dir():
+    return os.environ.get('XDG_CONFIG_HOME',
+                          os.path.expanduser('~/.config'))
+
+
+def _xdg_system_data_dirs():
+    default = '/usr/local/share:/usr/share'
+    dirs = os.environ.get('XDG_DATA_DIRS', default)
+    return [d for d in dirs.split(':') if d]
+
+
+def _xdg_system_config_dirs():
+    default = '/etc/xdg'
+    dirs = os.environ.get('XDG_CONFIG_DIRS', default)
+    return [d for d in dirs.split(':') if d]
 
 logger = logging.getLogger('menulibre')
 
@@ -101,7 +122,7 @@ def getRelatedKeys(menu_item_type, key_only=False):
 def escapeText(text):
     if text is None:
         return ""
-    return GLib.markup_escape_text(text)
+    return html.escape(text)
 
 
 def getProcessUsername(process):
@@ -248,7 +269,7 @@ def getMenuDiagnostics():
     menu_dirs = [
         getUserMenusDirectory()
     ]
-    for path in GLib.get_system_config_dirs():
+    for path in _xdg_system_config_dirs():
         menu_dirs.append(os.path.join(path, 'menus'))
     menus = []
     for menu_dir in menu_dirs:
@@ -267,7 +288,7 @@ def getMenuDiagnostics():
 
 def getItemSearchPaths():
     search_paths = []
-    for path in GLib.get_system_data_dirs():
+    for path in _xdg_system_data_dirs():
         search_paths.append(os.path.join(path, 'applications'))
     return search_paths
 
@@ -283,7 +304,7 @@ def getItemPath(file_id):
 
 def getUserApplicationsDirectory():
     """Return the path to the user applications directory."""
-    item_dir = os.path.join(GLib.get_user_data_dir(), 'applications')
+    item_dir = os.path.join(_xdg_user_data_dir(), 'applications')
     if not os.path.isdir(item_dir):
         os.makedirs(item_dir)
     return item_dir
@@ -300,7 +321,7 @@ def getUserItemPath(file_id):
 
 def getDirectorySearchPaths():
     search_paths = []
-    for path in GLib.get_system_data_dirs():
+    for path in _xdg_system_data_dirs():
         search_paths.append(os.path.join(path, 'desktop-directories'))
     return search_paths
 
@@ -332,7 +353,7 @@ def mapDesktopEnvironmentDirectories():
                 file_ids.append(filename)
 
     de_paths = {}
-    for path in GLib.get_system_data_dirs():
+    for path in _xdg_system_data_dirs():
         de_path = os.path.join(path, menu, 'desktop-directories')
         if not os.path.exists(de_path):
             continue
@@ -404,7 +425,7 @@ def unmapDesktopEnvironmentDirectories():
 
 def getUserDirectoriesDirectory():
     """Return the path to the user desktop-directories directory."""
-    menu_dir = os.path.join(GLib.get_user_data_dir(), 'desktop-directories')
+    menu_dir = os.path.join(_xdg_user_data_dir(), 'desktop-directories')
     if not os.path.isdir(menu_dir):
         os.makedirs(menu_dir)
     return menu_dir
@@ -421,7 +442,7 @@ def getUserDirectoryPath(file_id):
 
 def getUserMenusDirectory():
     """Return the path to the user menus directory."""
-    menu_dir = os.path.join(GLib.get_user_config_dir(), 'menus')
+    menu_dir = os.path.join(_xdg_user_config_dir(), 'menus')
     if not os.path.isdir(menu_dir):
         os.makedirs(menu_dir)
     return menu_dir
@@ -437,7 +458,7 @@ def getUserLauncherPath(basename):
 
 def getSystemMenuPath(file_id):
     """Return the path to the system-installed menu file."""
-    for path in GLib.get_system_config_dirs():
+    for path in _xdg_system_config_dirs():
         file_path = os.path.join(path, 'menus', file_id)
         if os.path.isfile(file_path):
             return file_path
@@ -698,25 +719,34 @@ def getSaveFilename(name, filename, item_type, force_update=False):  # noqa
 
 
 def check_keypress(event, keys):  # noqa
-    """Compare keypress events with desired keys and return True if matched."""
+    """Compare Qt keypress events with desired keys and return True if matched.
+
+    Accepts a QKeyEvent (PyQt5) and a list of key name strings such as
+    ['Control', 'z'] or ['Escape'].
+    """
+    from PyQt5.QtCore import Qt
+    modifiers = event.modifiers()
     if 'Control' in keys:
-        if not bool(event.get_state() & Gdk.ModifierType.CONTROL_MASK):
+        if not (modifiers & Qt.ControlModifier):
             return False
     if 'Alt' in keys:
-        if not bool(event.get_state() & Gdk.ModifierType.MOD1_MASK):
+        if not (modifiers & Qt.AltModifier):
             return False
     if 'Shift' in keys:
-        if not bool(event.get_state() & Gdk.ModifierType.SHIFT_MASK):
+        if not (modifiers & Qt.ShiftModifier):
             return False
     if 'Super' in keys:
-        if not bool(event.get_state() & Gdk.ModifierType.SUPER_MASK):
+        if not (modifiers & Qt.MetaModifier):
             return False
-    if 'Escape' in keys:
-        keys[keys.index('Escape')] = 'escape'
-    keyval_name = Gdk.keyval_name(event.get_keyval()[1])
-    if keyval_name is None:
+
+    from PyQt5.QtGui import QKeySequence
+    key_name = QKeySequence(event.key()).toString().lower()
+    if key_name is None:
         return False
-    if keyval_name.lower() not in keys:
+
+    lower_keys = [k.lower() for k in keys
+                  if k not in ('Control', 'Alt', 'Shift', 'Super')]
+    if key_name not in lower_keys:
         return False
 
     return True
@@ -756,13 +786,13 @@ def find_program(program):
     if len(program) == 0:
         return None
 
-    params = list(GLib.shell_parse_argv(program)[1])  # type: ignore
+    params = shlex.split(program)
     executable = params[0]
 
     if os.path.exists(executable):
         return executable
 
-    path = GLib.find_program_in_path(executable)
+    path = shutil.which(executable)
     if path is not None:
         return path
 
@@ -773,101 +803,67 @@ def validate_desktop_file(desktop_file):  # noqa
     """Validate a known-bad desktop file in the same way GMenu/glib does, to
     give a user real information about why certain files are broken."""
 
-    # This is a reimplementation of the validation logic in glib2's
-    # gio/gdesktopappinfo.c:g_desktop_app_info_load_from_keyfile.
-    # gnome-menus appears also to try to do its own validation in
-    # libmenu/desktop-entries.c:desktop_entry_load, however
-    # g_desktop_app_info_new_from_filename will not return a valid
-    # GDesktopAppInfo in the first place if something is wrong with the
-    # desktop file
+    import configparser
+
+    _DESKTOP_GROUP = 'Desktop Entry'
+    _KEY_TYPE = 'Type'
+    _KEY_TRY_EXEC = 'TryExec'
+    _KEY_EXEC = 'Exec'
+    _TYPE_APPLICATION = 'Application'
+    _TYPE_LINK = 'Link'
+    _TYPE_DIRECTORY = 'Directory'
 
     try:
-
-        # Looks like load_from_file is not a class method??
-        keyfile = GLib.KeyFile()
-        keyfile.load_from_file(desktop_file, GLib.KeyFileFlags.NONE)
-
+        keyfile = configparser.RawConfigParser(strict=False)
+        keyfile.read(desktop_file, encoding='utf-8')
     except Exception as e:
-        # Translators: This error is displayed when a desktop file cannot
-        # be correctly read by MenuLibre. A (possibly untranslated) error
-        # code is displayed.
         return _('Unable to load desktop file due to the following error:'
                  ' %s') % e
 
-    # File is at least a valid keyfile, so can start the real desktop
-    # validation
-    # Start group validation
-    try:
-        start_group = keyfile.get_start_group()
-    except GLib.Error:
-        start_group = None
+    sections = keyfile.sections()
+    start_group = sections[0] if sections else None
 
-    if start_group != GLib.KEY_FILE_DESKTOP_GROUP:
-        # Translators: This error is displayed when the first group in a
-        # failing desktop file is incorrect. "Start group" can be safely
-        # translated.
+    if start_group != _DESKTOP_GROUP:
         return (_('Start group is invalid - currently \'%s\', should be '
-                  '\'%s\'') % (start_group, GLib.KEY_FILE_DESKTOP_GROUP))
+                  '\'%s\'') % (start_group, _DESKTOP_GROUP))
 
-    # Type validation
-    try:
-        type_key = keyfile.get_string(start_group,  # type: ignore
-                                      GLib.KEY_FILE_DESKTOP_KEY_TYPE)
-    except GLib.Error:
-        # Translators: This error is displayed when a required key is
-        # missing in a failing desktop file.
+    if not keyfile.has_option(start_group, _KEY_TYPE):
         return _('%s key not found') % 'Type'
 
+    type_key = keyfile.get(start_group, _KEY_TYPE)
+
     valid_type_keys = [
-        GLib.KEY_FILE_DESKTOP_TYPE_APPLICATION,
-        GLib.KEY_FILE_DESKTOP_TYPE_LINK,
-        GLib.KEY_FILE_DESKTOP_TYPE_DIRECTORY,
-        # KDE-specific types
-        # https://specifications.freedesktop.org/desktop-entry-spec/latest/apb.html
+        _TYPE_APPLICATION,
+        _TYPE_LINK,
+        _TYPE_DIRECTORY,
         "ServiceType", "Service", "FSDevice"
     ]
     if type_key not in valid_type_keys:
-        # Translators: This error is displayed when a failing desktop file
-        # has an invalid value for the provided key.
         return (_('%s value is invalid - currently \'%s\', should be \'%s\'')
-                % ('Type', type_key, GLib.KEY_FILE_DESKTOP_TYPE_APPLICATION))
+                % ('Type', type_key, _TYPE_APPLICATION))
 
-    # Validating 'try exec' if its present
-    # Invalid TryExec is a valid state. "If the file is not present or if it
-    # is not executable, the entry may be ignored (not be used in menus, for
-    # example)."
-    try:
-        try_exec = keyfile.get_string(start_group,  # type: ignore
-                                      GLib.KEY_FILE_DESKTOP_KEY_TRY_EXEC)
-    except GLib.Error:
-        pass
-
-    else:
+    if keyfile.has_option(start_group, _KEY_TRY_EXEC):
         try:
+            try_exec = keyfile.get(start_group, _KEY_TRY_EXEC)
             if len(try_exec) > 0 and find_program(try_exec) is None:
                 return False
-        except Exception as e:
+        except Exception:
             return False
 
-    # Validating executable
-    try:
-        exec_key = keyfile.get_string(start_group,  # type: ignore
-                                      GLib.KEY_FILE_DESKTOP_KEY_EXEC)
-    except GLib.Error:
+    if not keyfile.has_option(start_group, _KEY_EXEC):
         return False  # LP: #1788814, Exec key is not required
 
     try:
+        exec_key = keyfile.get(start_group, _KEY_EXEC)
         if find_program(exec_key) is None:
             return (_('%s program \'%s\' has not been found in the PATH')
                     % ('Exec', exec_key))
     except Exception as e:
         return (_('%s program \'%s\' is not a valid shell command '
-                  'according to GLib.shell_parse_argv, error: %s')
+                  'according to shlex, error: %s')
                 % ('Exec', exec_key, e))
 
     if type_key == "Service":
-        return False  # KDE services are not displayed in the menu
+        return False
 
-    # Translators: This error is displayed for a failing desktop file where
-    # errors were detected but the file seems otherwise valid.
     return _('Unknown error. Desktop file appears to be valid.')

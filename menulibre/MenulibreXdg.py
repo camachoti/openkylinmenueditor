@@ -18,11 +18,10 @@
 import locale
 import os
 import json
+import configparser
 from locale import gettext as _
 
 import subprocess
-
-from gi.repository import GLib  # type: ignore
 
 locale.textdomain('menulibre')
 
@@ -31,13 +30,97 @@ sudo = os.getuid() == 0
 default_locale = locale.getdefaultlocale()[0]
 
 
+def _get_user_data_dir():
+    return os.environ.get('XDG_DATA_HOME', os.path.expanduser('~/.local/share'))
+
+
+def _get_system_config_dirs():
+    dirs = os.environ.get('XDG_CONFIG_DIRS', '/etc/xdg')
+    return [d for d in dirs.split(':') if d]
+
+
+class _KeyFile:
+    """Thin configparser wrapper that mimics the GLib.KeyFile API used here."""
+
+    def __init__(self):
+        self._cp = configparser.RawConfigParser(strict=False)
+        self._cp.optionxform = str  # preserve case
+
+    def load_from_file(self, filename, _flags=None):
+        self._cp = configparser.RawConfigParser(strict=False)
+        self._cp.optionxform = str
+        self._cp.read(filename, encoding='utf-8')
+
+    # --- read helpers ---
+
+    def get_string(self, group, key):
+        try:
+            return self._cp.get(group, key)
+        except (configparser.NoSectionError, configparser.NoOptionError):
+            return None
+
+    def get_value(self, group, key):
+        return self.get_string(group, key)
+
+    def get_locale_string(self, group, key, locale_str):
+        """Return localised value for key[locale_str] or plain key."""
+        locale_key = '%s[%s]' % (key, locale_str)
+        val = self.get_string(group, locale_key)
+        if val is None:
+            val = self.get_string(group, key)
+        return val
+
+    def get_string_list(self, group, key):
+        val = self.get_string(group, key)
+        if val is None:
+            return []
+        # Desktop-spec lists are semicolon-separated, trailing semicolon allowed
+        return [v for v in val.split(';') if v]
+
+    def get_groups(self):
+        return (self._cp.sections(), len(self._cp.sections()))
+
+    def get_keys(self, group):
+        try:
+            keys = list(self._cp.options(group))
+            return (keys, len(keys))
+        except configparser.NoSectionError:
+            return ([], 0)
+
+    def get_start_group(self):
+        sections = self._cp.sections()
+        return sections[0] if sections else None
+
+    # --- write helpers ---
+
+    def set_value(self, group, key, value):
+        if not self._cp.has_section(group):
+            self._cp.add_section(group)
+        self._cp.set(group, key, value)
+
+    def set_locale_string(self, group, key, locale_str, value):
+        locale_key = '%s[%s]' % (key, locale_str)
+        self.set_value(group, locale_key, value)
+
+    def to_data(self):
+        """Serialise back to .desktop file string."""
+        import io
+        buf = io.StringIO()
+        self._cp.write(buf, space_around_delimiters=False)
+        # configparser writes ' = ', strip spaces around '='
+        raw = buf.getvalue()
+        # configparser lowercases option names — we preserved case via optionxform
+        # also add trailing newline after each section as spec requires
+        return raw
+
+
 class MenulibreDesktopEntry:
 
     """Basic class for Desktop Entry files"""
 
     def __init__(self, filename=None):
         """Initialize the MenulibreDesktopEntry instance."""
-        self.keyfile = GLib.KeyFile.new()
+        self.keyfile = _KeyFile()
         if filename is not None and os.path.isfile(filename):
             self.load_properties(filename)
         else:
@@ -65,9 +148,8 @@ class MenulibreDesktopEntry:
 
     def load_properties(self, filename):
         """Load the properties."""
-        self.keyfile = GLib.KeyFile.new()
-        self.keyfile.load_from_file(filename,
-                                    GLib.KeyFileFlags.KEEP_TRANSLATIONS)
+        self.keyfile = _KeyFile()
+        self.keyfile.load_from_file(filename)
 
     def get_property(self, category, prop_name, locale_str=default_locale):
         """Return the value of the specified property."""
@@ -128,10 +210,7 @@ class MenulibreDesktopEntry:
         return None
 
     def _get_locale_string(self, group, key, locale_str):
-        try:
-            value = self.keyfile.get_locale_string(group, key, locale_str)
-        except GLib.Error:
-            value = None
+        value = self.keyfile.get_locale_string(group, key, locale_str)
 
         if value is not None:
             return value
@@ -146,44 +225,25 @@ class MenulibreDesktopEntry:
         self.keyfile.set_locale_string(group, key, locale_str, value)
 
     def _get_string(self, group, key):
-        try:
-            value = self.keyfile.get_string(group, key)
-        except GLib.Error:
-            value = None
+        value = self.keyfile.get_string(group, key)
         if value is not None:
             return value
         return ""
 
     def _get_value(self, group, key):
-        try:
-            value = self.keyfile.get_value(group, key)
-        except GLib.Error:
-            value = None
-        return value
+        return self.keyfile.get_value(group, key)
 
     def _set_value(self, group, key, value):
         self.keyfile.set_value(group, key, value)
 
     def _get_string_list(self, group, key):
-        try:
-            value = self.keyfile.get_string_list(group, key)
-        except GLib.Error:
-            value = None
-        if value is not None:
-            return value
-        return []
+        return self.keyfile.get_string_list(group, key)
 
     def _get_groups(self):
-        try:
-            return self.keyfile.get_groups()[0]
-        except GLib.Error:
-            return []
+        return self.keyfile.get_groups()[0]
 
     def _get_keys(self, group):
-        try:
-            return self.keyfile.get_keys(group)[0]
-        except GLib.Error:
-            return []
+        return self.keyfile.get_keys(group)[0]
 
 
 def desktop_menu_update():
@@ -201,7 +261,7 @@ def desktop_menu_install(directory_files, desktop_files):
         return True
 
     # Do not install to system paths.
-    for path in GLib.get_system_config_dirs():
+    for path in _get_system_config_dirs():
         for filename in directory_files:
             if filename.startswith(path):
                 return True
@@ -209,7 +269,7 @@ def desktop_menu_install(directory_files, desktop_files):
     # xdg-desktop-menu doesn't behave nicely with vendor- directories
     # without vendor- applications.
     directory_dir = os.path.join(
-        GLib.get_user_data_dir(),
+        _get_user_data_dir(),
         "desktop-directories")
     for filename in directory_files:
         if not filename.startswith(directory_dir):
@@ -240,7 +300,7 @@ def desktop_menu_uninstall(directory_files, desktop_files):  # noqa
         return
 
     # Do not uninstall from system paths.
-    for path in GLib.get_system_config_dirs():
+    for path in _get_system_config_dirs():
         for filename in directory_files:
             if filename.startswith(path):
                 return
@@ -253,7 +313,7 @@ def desktop_menu_uninstall(directory_files, desktop_files):  # noqa
     base_filename = os.path.basename(desktop_files[0])
 
     # Find the file with all the details to remove the filename.
-    merged_dir = os.path.join(GLib.get_user_config_dir(),
+    merged_dir = os.path.join(os.environ.get('XDG_CONFIG_HOME', os.path.expanduser('~/.config')),
                               "menus", "applications-merged")
 
     for filename in os.listdir(merged_dir):
