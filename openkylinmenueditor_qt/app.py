@@ -588,7 +588,7 @@ QLabel#section_title {
 }
 QFrame#section_card {
     background: palette(base);
-    border: 1px solid palette(mid);
+    border: 1px solid palette(base);
     border-radius: 10px;
 }
 QFrame#section_card QWidget {
