@@ -24,6 +24,8 @@ from .treeview import Treeview
 from .toolbar import Toolbar
 from .dialogs import AboutDialog, SaveDialog, show_error
 from .file_handler import open_folder, copy_to_clipboard, open_editor
+from .editor import ApplicationEditor
+from .history import History
 
 logger = logging.getLogger('menulibre')
 
@@ -41,10 +43,17 @@ class MainWindow(QMainWindow):
         self._current_filename: str = ''
         self._dirty: bool = False
 
+        self._history = History(self)
+
         self._build_menubar()
         self._build_toolbar()
         self._build_central()
         self._build_statusbar()
+
+        # Wire history signals now that actions exist
+        self._history.undo_changed.connect(self._act_undo.setEnabled)
+        self._history.redo_changed.connect(self._act_redo.setEnabled)
+        self._history.revert_changed.connect(self._act_revert.setEnabled)
 
         self._load_menu()
 
@@ -175,15 +184,14 @@ class MainWindow(QMainWindow):
 
         splitter.addWidget(self._treeview)
 
-        # ── right: editor placeholder ────────────────────────────────
+        # ── right: editor panel ──────────────────────────────────────
+        self._editor = ApplicationEditor()
+        self._editor.value_changed.connect(self._on_value_changed)
+
         self._editor_area = QScrollArea()
         self._editor_area.setWidgetResizable(True)
         self._editor_area.setFrameShape(QFrame.NoFrame)
-
-        placeholder = QLabel(_('Select a launcher or directory to edit.'))
-        placeholder.setAlignment(Qt.AlignCenter)
-        placeholder.setObjectName('editor_placeholder')
-        self._editor_area.setWidget(placeholder)
+        self._editor_area.setWidget(self._editor)
 
         splitter.addWidget(self._editor_area)
         splitter.setStretchFactor(0, 0)
@@ -223,27 +231,111 @@ class MainWindow(QMainWindow):
         self._act_delete.setEnabled(bool(filename))
         self._act_execute.setEnabled(bool(filename))
         self._status_label.setText(filename or _('Ready'))
-        # TODO: load filename into editor panel (Phase 5)
+
+        if not filename:
+            return
+
+        # Load the desktop entry into the editor
+        self._load_entry(filename, item_type)
+
+    def _load_entry(self, filename: str, item_type: int):
+        """Read filename and populate the editor panel."""
+        try:
+            from menulibre.MenulibreXdg import MenulibreDesktopEntry
+            from menulibre.util import MenuItemTypes, MenuItemKeys
+
+            entry = MenulibreDesktopEntry(filename)
+            self._history.clear()
+            self._history.block()
+
+            self._editor.set_value('Filename', filename)
+            self._editor.set_value('Type', entry['Type'] or 'Application')
+
+            for key in MenuItemKeys:
+                try:
+                    val = entry[key]
+                    self._editor.set_value(key, val)
+                    self._history.store(key, val)
+                except Exception:
+                    pass
+
+            self._history.unblock()
+            self._dirty = False
+            self._act_save.setEnabled(False)
+            self._act_revert.setEnabled(False)
+
+        except Exception as e:
+            logger.warning('Failed to load entry %s: %s', filename, e)
+
+    @pyqtSlot(str, str)
+    def _on_value_changed(self, key: str, value: str):
+        """Called when any editor widget changes a value."""
+        if not self._current_filename:
+            return
+        before = self._editor.get_value(key)
+        self._history.append(key, before, value)
+        self._dirty = True
+        self._act_save.setEnabled(True)
 
     # ------------------------------------------------------------------
     # Slots — edit actions
     # ------------------------------------------------------------------
 
     def _on_save(self):
-        logger.debug('save: %s', self._current_filename)
-        self._dirty = False
-        self._act_save.setEnabled(False)
-        # TODO: persist changes via MenulibreXdg (Phase 5)
+        """Persist the current editor state to the .desktop file."""
+        if not self._current_filename:
+            return
+        try:
+            from menulibre.MenulibreXdg import MenulibreDesktopEntry
+            from menulibre.util import MenuItemKeys
+
+            entry = MenulibreDesktopEntry(self._current_filename)
+            for key in MenuItemKeys:
+                val = self._editor.get_value(key)
+                if val is not None:
+                    entry[key] = str(val) if not isinstance(val, str) else val
+
+            # Write back to file
+            data = entry.keyfile.to_data()
+            with open(self._current_filename, 'w', encoding='utf-8') as f:
+                f.write(data)
+
+            self._dirty = False
+            self._act_save.setEnabled(False)
+            self._act_revert.setEnabled(False)
+            self._history.clear()
+            self._status_label.setText(_('Saved'))
+
+        except Exception as e:
+            logger.error('Save failed: %s', e)
+            show_error(self, _('Save Error'), str(e))
 
     def _on_undo(self):
-        logger.debug('undo')
-        # TODO: hook into MenulibreHistory (Phase 5)
+        if not self._history.can_undo():
+            return
+        key, value = self._history.undo()
+        self._editor.set_value(key, value)
+        self._act_undo.setEnabled(self._history.can_undo())
+        self._act_redo.setEnabled(True)
 
     def _on_redo(self):
-        logger.debug('redo')
+        if not self._history.can_redo():
+            return
+        key, value = self._history.redo()
+        self._editor.set_value(key, value)
+        self._act_redo.setEnabled(self._history.can_redo())
+        self._act_undo.setEnabled(True)
 
     def _on_revert(self):
-        logger.debug('revert')
+        restore = self._history.restore()
+        self._history.block()
+        for key, value in restore.items():
+            self._editor.set_value(key, value)
+        self._history.clear()
+        self._history.unblock()
+        self._dirty = False
+        self._act_save.setEnabled(False)
+        self._act_revert.setEnabled(False)
 
     def _on_delete(self):
         if not self._current_filename:
