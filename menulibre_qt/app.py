@@ -242,7 +242,7 @@ class MainWindow(QMainWindow):
         """Read filename and populate the editor panel."""
         try:
             from menulibre.MenulibreXdg import MenulibreDesktopEntry
-            from menulibre.util import MenuItemTypes, MenuItemKeys
+            from menulibre.util import MenuItemKeys
 
             entry = MenulibreDesktopEntry(filename)
             self._history.clear()
@@ -251,11 +251,15 @@ class MainWindow(QMainWindow):
             self._editor.set_value('Filename', filename)
             self._editor.set_value('Type', entry['Type'] or 'Application')
 
-            for key in MenuItemKeys:
+            for key_tuple in MenuItemKeys:
+                key = key_tuple[0]  # MenuItemKeys entries are (name, type, required, item_types)
                 try:
-                    val = entry[key]
+                    if key == 'Actions':
+                        val = entry.get_actions()
+                    else:
+                        val = entry[key]
                     self._editor.set_value(key, val)
-                    self._history.store(key, val)
+                    self._history.store(key, str(val) if val is not None else '')
                 except Exception:
                     pass
 
@@ -265,7 +269,7 @@ class MainWindow(QMainWindow):
             self._act_revert.setEnabled(False)
 
         except Exception as e:
-            logger.warning('Failed to load entry %s: %s', filename, e)
+            logger.warning('Failed to load entry %s: %s', filename, e, exc_info=True)
 
     @pyqtSlot(str, str)
     def _on_value_changed(self, key: str, value: str):
@@ -290,7 +294,8 @@ class MainWindow(QMainWindow):
             from menulibre.util import MenuItemKeys
 
             entry = MenulibreDesktopEntry(self._current_filename)
-            for key in MenuItemKeys:
+            for key_tuple in MenuItemKeys:
+                key = key_tuple[0]
                 val = self._editor.get_value(key)
                 if val is not None:
                     entry[key] = str(val) if not isinstance(val, str) else val
