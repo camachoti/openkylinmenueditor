@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle('OpenKylinMenuEditor')
         self.setWindowIcon(get_icon('OpenKylinMenuEditor'))
-        self.resize(900, 600)
+        self.resize(1000, 640)
 
         self._current_filename: str = ''
         self._dirty: bool = False
@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         splitter.addWidget(self._editor_area)
         splitter.setStretchFactor(0, 0)
         splitter.setStretchFactor(1, 1)
-        splitter.setSizes([220, 680])
+        splitter.setSizes([240, 760])
 
         self.setCentralWidget(splitter)
 
@@ -416,22 +416,350 @@ def run():
 
 def _get_stylesheet() -> str:
     return """
+/* ── Global ──────────────────────────────────────────────────────── */
 QMainWindow, QWidget {
-    font-family: "Noto Sans", "Segoe UI", sans-serif;
+    font-family: "Noto Sans", "HarmonyOS Sans SC", "Segoe UI", sans-serif;
+    font-size: 9pt;
 }
-QTreeView {
-    border: none;
-    background: palette(base);
+
+/* ── Menu bar ─────────────────────────────────────────────────────── */
+QMenuBar {
+    background: palette(window);
+    border-bottom: 1px solid palette(mid);
+    padding: 2px 4px;
 }
-QTreeView::item:selected {
+QMenuBar::item {
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+QMenuBar::item:selected {
     background: palette(highlight);
     color: palette(highlighted-text);
 }
-QToolBar {
-    border: none;
-    spacing: 2px;
+QMenu {
+    border: 1px solid palette(mid);
+    border-radius: 6px;
+    padding: 4px;
 }
+QMenu::item {
+    padding: 6px 20px;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background: palette(highlight);
+    color: palette(highlighted-text);
+}
+QMenu::separator {
+    height: 1px;
+    background: palette(mid);
+    margin: 4px 8px;
+}
+
+/* ── Main toolbar ─────────────────────────────────────────────────── */
+QToolBar#main_toolbar {
+    background: palette(window);
+    border-bottom: 1px solid palette(mid);
+    padding: 4px 8px;
+    spacing: 4px;
+}
+QToolBar#main_toolbar QToolButton {
+    border-radius: 4px;
+    padding: 4px;
+    background: transparent;
+}
+QToolBar#main_toolbar QToolButton:hover {
+    background: palette(midlight);
+}
+QToolBar#main_toolbar QToolButton:pressed {
+    background: palette(mid);
+}
+
+/* ── Sidebar (left panel) ──────────────────────────────────────────── */
+Treeview {
+    background: palette(alternateBase);
+}
+
+/* ── Sidebar search ───────────────────────────────────────────────── */
+QLineEdit#sidebar_search {
+    border: 1px solid palette(mid);
+    border-radius: 14px;
+    padding: 4px 12px;
+    background: palette(base);
+    margin: 6px 8px 4px 8px;
+}
+QLineEdit#sidebar_search:focus {
+    border: 1px solid palette(highlight);
+}
+
+/* ── Tree view ────────────────────────────────────────────────────── */
+QTreeView#sidebar_tree {
+    border: none;
+    background: palette(alternateBase);
+    outline: none;
+    show-decoration-selected: 1;
+}
+QTreeView#sidebar_tree::item {
+    min-height: 30px;
+    padding-left: 4px;
+    padding-right: 4px;
+    border-radius: 4px;
+}
+QTreeView#sidebar_tree::item:selected {
+    background: palette(highlight);
+    color: palette(highlighted-text);
+    border-radius: 4px;
+}
+QTreeView#sidebar_tree::item:hover:!selected {
+    background: palette(midlight);
+    border-radius: 4px;
+}
+QTreeView#sidebar_tree::branch {
+    background: palette(alternateBase);
+}
+QTreeView#sidebar_tree::branch:has-children:!has-siblings:closed,
+QTreeView#sidebar_tree::branch:closed:has-children:has-siblings {
+    border-image: none;
+    image: url(none);
+}
+
+/* ── Sidebar bottom toolbar ───────────────────────────────────────── */
+Treeview QToolBar {
+    background: palette(alternateBase);
+    border-top: 1px solid palette(mid);
+    spacing: 2px;
+    padding: 2px 4px;
+}
+Treeview QToolBar QToolButton {
+    border-radius: 4px;
+    padding: 3px;
+    background: transparent;
+}
+Treeview QToolBar QToolButton:hover {
+    background: palette(midlight);
+}
+Treeview QToolBar QToolButton:pressed {
+    background: palette(mid);
+}
+Treeview QToolBar QToolButton:checked {
+    background: palette(highlight);
+    color: palette(highlighted-text);
+}
+
+/* ── Splitter ─────────────────────────────────────────────────────── */
+QSplitter::handle {
+    background: palette(mid);
+}
+QSplitter::handle:horizontal {
+    width: 1px;
+}
+
+/* ── Scroll area ─────────────────────────────────────────────────── */
 QScrollArea {
     border: none;
+    background: palette(base);
+}
+
+/* ── Editor header card ───────────────────────────────────────────── */
+QFrame#editor_header {
+    background: palette(base);
+    border: 1px solid palette(mid);
+    border-radius: 8px;
+    padding: 4px;
+}
+
+/* ── Filename bar ─────────────────────────────────────────────────── */
+QFrame#filename_bar {
+    background: palette(alternateBase);
+    border: 1px solid palette(mid);
+    border-radius: 6px;
+}
+
+/* ── GroupBox cards ───────────────────────────────────────────────── */
+QGroupBox {
+    border: 1px solid palette(mid);
+    border-radius: 8px;
+    margin-top: 20px;
+    padding: 12px 8px 8px 8px;
+    font-weight: 600;
+    background: palette(base);
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    top: 4px;
+    padding: 0 4px;
+    color: palette(text);
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────── */
+QTabWidget::pane {
+    border: 1px solid palette(mid);
+    border-radius: 0px 6px 6px 6px;
+    background: palette(base);
+}
+QTabBar {
+    background: transparent;
+}
+QTabBar::tab {
+    background: palette(alternateBase);
+    border: 1px solid palette(mid);
+    border-bottom: none;
+    border-radius: 6px 6px 0px 0px;
+    padding: 6px 16px;
+    margin-right: 2px;
+    min-width: 60px;
+}
+QTabBar::tab:selected {
+    background: palette(base);
+    border-bottom: 1px solid palette(base);
+    color: palette(highlight);
+    font-weight: 600;
+}
+QTabBar::tab:hover:!selected {
+    background: palette(midlight);
+}
+
+/* ── Line edit ────────────────────────────────────────────────────── */
+QLineEdit {
+    border: 1px solid palette(mid);
+    border-radius: 4px;
+    padding: 4px 8px;
+    background: palette(base);
+    selection-background-color: palette(highlight);
+}
+QLineEdit:focus {
+    border: 1px solid palette(highlight);
+}
+QLineEdit:disabled {
+    color: palette(mid);
+}
+
+/* ── Push button ─────────────────────────────────────────────────── */
+QPushButton {
+    border: 1px solid palette(mid);
+    border-radius: 4px;
+    padding: 4px 12px;
+    background: palette(button);
+    min-width: 60px;
+}
+QPushButton:hover {
+    background: palette(midlight);
+    border: 1px solid palette(highlight);
+}
+QPushButton:pressed {
+    background: palette(mid);
+}
+QPushButton:flat {
+    border: none;
+    background: transparent;
+    min-width: 0;
+    padding: 2px;
+    border-radius: 4px;
+}
+QPushButton:flat:hover {
+    background: palette(midlight);
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────── */
+QCheckBox {
+    spacing: 8px;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid palette(mid);
+    border-radius: 3px;
+    background: palette(base);
+}
+QCheckBox::indicator:checked {
+    background: palette(highlight);
+    border: 1px solid palette(highlight);
+}
+QCheckBox::indicator:hover {
+    border: 1px solid palette(highlight);
+}
+
+/* ── ComboBox ─────────────────────────────────────────────────────── */
+QComboBox {
+    border: 1px solid palette(mid);
+    border-radius: 4px;
+    padding: 4px 8px;
+    background: palette(base);
+}
+QComboBox:focus {
+    border: 1px solid palette(highlight);
+}
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+QComboBox QAbstractItemView {
+    border: 1px solid palette(mid);
+    border-radius: 4px;
+    selection-background-color: palette(highlight);
+}
+
+/* ── Table view ───────────────────────────────────────────────────── */
+QTableWidget, QTableView {
+    border: 1px solid palette(mid);
+    border-radius: 6px;
+    gridline-color: palette(mid);
+    background: palette(base);
+    alternate-background-color: palette(alternateBase);
+    selection-background-color: palette(highlight);
+    selection-color: palette(highlighted-text);
+}
+QHeaderView::section {
+    background: palette(alternateBase);
+    border: none;
+    border-right: 1px solid palette(mid);
+    border-bottom: 1px solid palette(mid);
+    padding: 4px 8px;
+    font-weight: 600;
+}
+
+/* ── Scrollbars ───────────────────────────────────────────────────── */
+QScrollBar:vertical {
+    background: transparent;
+    width: 8px;
+    margin: 2px;
+    border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+    background: palette(mid);
+    border-radius: 4px;
+    min-height: 20px;
+}
+QScrollBar::handle:vertical:hover {
+    background: palette(shadow);
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+QScrollBar:horizontal {
+    background: transparent;
+    height: 8px;
+    margin: 2px;
+    border-radius: 4px;
+}
+QScrollBar::handle:horizontal {
+    background: palette(mid);
+    border-radius: 4px;
+    min-width: 20px;
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* ── Status bar ───────────────────────────────────────────────────── */
+QStatusBar {
+    background: palette(window);
+    border-top: 1px solid palette(mid);
+    padding: 2px 8px;
+}
+QStatusBar QLabel {
+    color: palette(mid);
+    font-size: 8pt;
 }
 """

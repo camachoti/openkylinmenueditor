@@ -61,7 +61,7 @@ class Treeview(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumWidth(220)
+        self.setMinimumWidth(240)
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 
         self._model: QStandardItemModel | None = None
@@ -81,6 +81,7 @@ class Treeview(QWidget):
 
         # ── search bar ──────────────────────────────────────────────
         self._search = QLineEdit()
+        self._search.setObjectName('sidebar_search')
         self._search.setPlaceholderText(_('Search…'))
         self._search.setClearButtonEnabled(True)
         self._search.textChanged.connect(self._on_search_changed)
@@ -88,11 +89,12 @@ class Treeview(QWidget):
 
         # ── tree view ────────────────────────────────────────────────
         self._tree = QTreeView()
+        self._tree.setObjectName('sidebar_tree')
         self._tree.setHeaderHidden(True)
         self._tree.setSelectionMode(QAbstractItemView.SingleSelection)
         self._tree.setDragDropMode(QAbstractItemView.InternalMove)
         self._tree.setAnimated(True)
-        self._tree.setIconSize(QSize(16, 16))
+        self._tree.setIconSize(QSize(20, 20))
         self._tree.selectionModel  # lazy; will be set after model
         layout.addWidget(self._tree)
 

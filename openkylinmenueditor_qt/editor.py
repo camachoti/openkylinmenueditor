@@ -125,7 +125,7 @@ class ApplicationEditor(QWidget):
 
     def _build_ui(self):
         outer = QVBoxLayout(self)
-        outer.setContentsMargins(12, 12, 12, 12)
+        outer.setContentsMargins(16, 16, 16, 16)
         outer.setSpacing(10)
 
         # ── header card: icon + name + comment ────────────────────────
@@ -133,6 +133,7 @@ class ApplicationEditor(QWidget):
         header.setObjectName('editor_header')
         header.setFrameShape(QFrame.StyledPanel)
         header_layout = QHBoxLayout(header)
+        header_layout.setContentsMargins(16, 16, 16, 16)
         header_layout.setSpacing(10)
 
         self._icon_entry = IconEntry()
@@ -249,6 +250,7 @@ class ApplicationEditor(QWidget):
 
         # ── Filename bar ───────────────────────────────────────────────
         filename_bar = QFrame()
+        filename_bar.setObjectName('filename_bar')
         filename_bar.setFrameShape(QFrame.StyledPanel)
         filename_layout = QHBoxLayout(filename_bar)
         filename_layout.setContentsMargins(6, 4, 6, 4)
