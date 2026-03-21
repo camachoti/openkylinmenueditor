@@ -574,22 +574,26 @@ QFrame#filename_bar {
     border-radius: 6px;
 }
 
-/* ── GroupBox cards ───────────────────────────────────────────────── */
+/* ── GroupBox sections (borderless) ──────────────────────────────── */
 QGroupBox {
-    border: 1px solid palette(mid);
-    border-radius: 8px;
+    border: none;
+    border-top: 1px solid palette(mid);
+    border-radius: 0px;
     margin-top: 20px;
-    padding: 12px 8px 8px 8px;
+    padding: 12px 4px 4px 4px;
     font-weight: 600;
-    background: palette(base);
+    background: transparent;
 }
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    left: 12px;
-    top: 4px;
-    padding: 0 4px;
-    color: palette(text);
+    left: 0px;
+    top: 0px;
+    padding: 0 0;
+    color: palette(mid);
+    font-size: 8pt;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 /* ── Tabs ─────────────────────────────────────────────────────────── */
