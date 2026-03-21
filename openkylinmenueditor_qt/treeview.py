@@ -165,14 +165,20 @@ class Treeview(QWidget):
         idx = self._current_source_index()
         if not idx.isValid():
             return ''
-        item = self._model.itemFromIndex(idx)
+        source = self._proxy.sourceModel()
+        if not isinstance(source, QStandardItemModel):
+            return ''
+        item = source.itemFromIndex(idx)
         return item.data(ROLE_FILENAME) if item else ''
 
     def get_selected_type(self) -> int:
         idx = self._current_source_index()
         if not idx.isValid():
             return -1
-        item = self._model.itemFromIndex(idx)
+        source = self._proxy.sourceModel()
+        if not isinstance(source, QStandardItemModel):
+            return -1
+        item = source.itemFromIndex(idx)
         return item.data(ROLE_TYPE) if item else -1
 
     # ------------------------------------------------------------------
@@ -185,12 +191,21 @@ class Treeview(QWidget):
             return QModelIndex()
         return self._proxy.mapToSource(proxy_idx)
 
+    def _reconnect_selection_model(self):
+        """Re-attach selectionChanged after the proxy source model is swapped."""
+        sel = self._tree.selectionModel()
+        if sel:
+            sel.selectionChanged.connect(self._on_selection_changed)
+
     def _on_selection_changed(self, selected, _deselected):
         indexes = selected.indexes()
         if not indexes:
             return
         src_idx = self._proxy.mapToSource(indexes[0])
-        item = self._model.itemFromIndex(src_idx)
+        source = self._proxy.sourceModel()
+        if not isinstance(source, QStandardItemModel):
+            return
+        item = source.itemFromIndex(src_idx)
         if item is None:
             return
         filename = item.data(ROLE_FILENAME) or ''
@@ -233,6 +248,7 @@ class Treeview(QWidget):
             _collect(self._model.invisibleRootItem())
 
         self._proxy.setSourceModel(flat)
+        self._reconnect_selection_model()
         self._tree.setRootIsDecorated(False)
         self._act_move_up.setEnabled(False)
         self._act_move_down.setEnabled(False)
@@ -242,6 +258,7 @@ class Treeview(QWidget):
         """Restore the full tree."""
         if self._model:
             self._proxy.setSourceModel(self._model)
+            self._reconnect_selection_model()
         self._tree.setRootIsDecorated(True)
         self._tree.expandToDepth(0)
         self._act_move_up.setEnabled(True)
