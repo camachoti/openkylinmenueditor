@@ -386,10 +386,25 @@ class MenuEditor(object):
         unmapDesktopEnvironmentDirectories()
 
     def hasContents(self):
-        for child in self.getMenus(None):
-            submenus = self.getContents(child[0])
-            if len(submenus) > 0:
+        root = self.tree.get_root_directory()
+        if root is None:
+            return False
+        return self._tree_dir_has_entries(root)
+
+    def _tree_dir_has_entries(self, directory):
+        """Return True if directory (or any subdirectory) contains at least
+        one entry or separator."""
+        item_iter = directory.iter()
+        item_type = item_iter.next()
+        while item_type != GMenu.TreeItemType.INVALID:
+            if item_type in (GMenu.TreeItemType.ENTRY,
+                             GMenu.TreeItemType.SEPARATOR):
                 return True
+            if item_type == GMenu.TreeItemType.DIRECTORY:
+                subdir = item_iter.get_directory()
+                if self._tree_dir_has_entries(subdir):
+                    return True
+            item_type = item_iter.next()
         return False
 
     def getMenus(self, parent):
@@ -421,12 +436,13 @@ class MenuEditor(object):
                 desktop = item.get_desktop_file_path()
                 if desktop is not None:
                     desktop = os.path.realpath(desktop)
-                if desktop is None or desktop in found_directories:
-                    # Do not include directories without filenames.
-                    # Do not include duplicate directories.
-                    item = None
-                else:
-                    found_directories.append(desktop)
+                    if desktop in found_directories:
+                        # Do not include duplicate directories.
+                        item = None
+                    else:
+                        found_directories.append(desktop)
+                # Directories without a .directory file (virtual categories)
+                # are still included so their child entries can be shown.
             elif item_type == GMenu.TreeItemType.ENTRY:
                 item = item_iter.get_entry()
             elif item_type == GMenu.TreeItemType.HEADER:
