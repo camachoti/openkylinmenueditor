@@ -633,14 +633,15 @@ QTabBar::tab:hover:!selected {
 
 /* ── Line edit ────────────────────────────────────────────────────── */
 QLineEdit {
-    border: 1px solid palette(mid);
+    border: 1px solid palette(window);
     border-radius: 4px;
     padding: 4px 8px;
-    background: palette(base);
+    background: palette(window);
     selection-background-color: palette(highlight);
 }
 QLineEdit:focus {
     border: 1px solid palette(highlight);
+    background: palette(base);
 }
 QLineEdit:disabled {
     color: palette(mid);
