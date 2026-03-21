@@ -594,6 +594,14 @@ QFrame#section_card {
 QFrame#section_card QWidget {
     background: transparent;
 }
+QFrame#section_card QLineEdit {
+    background: palette(window);
+    border: 1px solid palette(window);
+}
+QFrame#section_card QLineEdit:focus {
+    background: palette(base);
+    border: 1px solid palette(highlight);
+}
 
 /* ── Row separators inside cards ─────────────────────────────────── */
 QFrame#row_separator {
