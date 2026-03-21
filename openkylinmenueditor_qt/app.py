@@ -598,7 +598,7 @@ QFrame#section_card QWidget {
 /* ── Row separators inside cards ─────────────────────────────────── */
 QFrame#row_separator {
     border: none;
-    border-top: 1px solid palette(mid);
+    border-top: 1px solid palette(window);
     max-height: 1px;
     background: transparent;
 }
