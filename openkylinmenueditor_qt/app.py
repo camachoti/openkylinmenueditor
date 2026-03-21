@@ -574,26 +574,33 @@ QFrame#filename_bar {
     border-radius: 6px;
 }
 
-/* ── GroupBox sections (borderless) ──────────────────────────────── */
-QGroupBox {
-    border: none;
-    border-top: 1px solid palette(mid);
-    border-radius: 0px;
-    margin-top: 20px;
-    padding: 12px 4px 4px 4px;
-    font-weight: 600;
+/* ── Editor scroll content (gray outer background) ───────────────── */
+QWidget#editor_content {
+    background: palette(window);
+}
+
+/* ── Section cards ────────────────────────────────────────────────── */
+QLabel#section_title {
+    color: palette(text);
+    font-size: 9pt;
+    font-weight: 500;
+    padding: 0 2px;
+}
+QFrame#section_card {
+    background: palette(base);
+    border: 1px solid palette(mid);
+    border-radius: 10px;
+}
+QFrame#section_card QWidget {
     background: transparent;
 }
-QGroupBox::title {
-    subcontrol-origin: margin;
-    subcontrol-position: top left;
-    left: 0px;
-    top: 0px;
-    padding: 0 0;
-    color: palette(mid);
-    font-size: 8pt;
-    font-weight: 600;
-    text-transform: uppercase;
+
+/* ── Row separators inside cards ─────────────────────────────────── */
+QFrame#row_separator {
+    border: none;
+    border-top: 1px solid palette(mid);
+    max-height: 1px;
+    background: transparent;
 }
 
 /* ── Tabs ─────────────────────────────────────────────────────────── */

@@ -13,7 +13,7 @@ from locale import gettext as _
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
     QLabel, QLineEdit, QPushButton, QCheckBox, QTabWidget,
-    QScrollArea, QFrame, QGroupBox, QSizePolicy, QSpacerItem,
+    QScrollArea, QFrame, QSizePolicy, QSpacerItem,
     QFileDialog, QApplication
 )
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
@@ -32,6 +32,35 @@ ADVANCED_KEYS = [
 ]
 
 
+class _SectionCard(QWidget):
+    """Title label above + white rounded card frame containing rows."""
+
+    def __init__(self, title: str, parent=None):
+        super().__init__(parent)
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(0, 0, 0, 0)
+        outer.setSpacing(6)
+
+        title_lbl = QLabel(title)
+        title_lbl.setObjectName('section_title')
+        outer.addWidget(title_lbl)
+
+        self._card = QFrame()
+        self._card.setObjectName('section_card')
+        self._card_layout = QVBoxLayout(self._card)
+        self._card_layout.setContentsMargins(0, 0, 0, 0)
+        self._card_layout.setSpacing(0)
+        outer.addWidget(self._card)
+
+    def add_row(self, widget):
+        if self._card_layout.count() > 0:
+            sep = QFrame()
+            sep.setObjectName('row_separator')
+            sep.setFrameShape(QFrame.HLine)
+            self._card_layout.addWidget(sep)
+        self._card_layout.addWidget(widget)
+
+
 class _FieldRow(QWidget):
     """Label + editor widget pair for a single desktop entry key."""
 
@@ -42,11 +71,11 @@ class _FieldRow(QWidget):
         super().__init__(parent)
         self._key = key
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 2, 0, 2)
+        layout.setContentsMargins(16, 10, 16, 10)
 
         lbl = QLabel(label)
-        lbl.setMinimumWidth(140)
-        lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        lbl.setMinimumWidth(150)
+        lbl.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         if tooltip:
             lbl.setToolTip(tooltip)
         layout.addWidget(lbl)
@@ -77,11 +106,11 @@ class _SwitchRow(QWidget):
         super().__init__(parent)
         self._key = key
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(0, 2, 0, 2)
+        layout.setContentsMargins(16, 10, 16, 10)
 
         lbl = QLabel(label)
-        lbl.setMinimumWidth(140)
-        lbl.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        lbl.setMinimumWidth(150)
+        lbl.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
         if tooltip:
             lbl.setToolTip(tooltip)
         layout.addWidget(lbl)
@@ -167,61 +196,59 @@ class ApplicationEditor(QWidget):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
         content = QWidget()
+        content.setObjectName('editor_content')
         scroll_layout = QVBoxLayout(content)
-        scroll_layout.setSpacing(10)
+        scroll_layout.setSpacing(20)
+        scroll_layout.setContentsMargins(0, 8, 0, 8)
         scroll.setWidget(content)
         outer.addWidget(scroll)
 
         # ── Application Details ────────────────────────────────────────
-        app_group = QGroupBox(_('Application Details'))
-        app_layout = QVBoxLayout(app_group)
-        app_layout.setSpacing(4)
+        app_card = _SectionCard(_('Application Details'))
 
         self._exec_row = _FieldRow(
             _('Command'), 'Exec',
             _('Program to execute with arguments.'))
         self._exec_row.value_changed.connect(self._on_changed)
         self._fields['Exec'] = self._exec_row
-        app_layout.addWidget(self._exec_row)
+        app_card.add_row(self._exec_row)
 
         self._path_row = _FieldRow(
             _('Working Directory'), 'Path',
             _('The working directory.'))
         self._path_row.value_changed.connect(self._on_changed)
         self._fields['Path'] = self._path_row
-        app_layout.addWidget(self._path_row)
+        app_card.add_row(self._path_row)
 
-        self._directory_hide.append(app_group)
-        scroll_layout.addWidget(app_group)
+        self._directory_hide.append(app_card)
+        scroll_layout.addWidget(app_card)
 
         # ── Options ───────────────────────────────────────────────────
-        opts_group = QGroupBox(_('Options'))
-        opts_layout = QVBoxLayout(opts_group)
-        opts_layout.setSpacing(4)
+        opts_card = _SectionCard(_('Options'))
 
         self._terminal_row = _SwitchRow(
             _('Run in terminal'), 'Terminal',
             _('Run in a terminal window.'))
         self._terminal_row.value_changed.connect(self._on_changed)
         self._fields['Terminal'] = self._terminal_row
-        opts_layout.addWidget(self._terminal_row)
+        opts_card.add_row(self._terminal_row)
 
         self._notify_row = _SwitchRow(
             _('Use startup notification'), 'StartupNotify',
             _('Send a startup notification (busy cursor).'))
         self._notify_row.value_changed.connect(self._on_changed)
         self._fields['StartupNotify'] = self._notify_row
-        opts_layout.addWidget(self._notify_row)
+        opts_card.add_row(self._notify_row)
 
         self._nodisplay_row = _SwitchRow(
             _('Hide from menus'), 'NoDisplay',
             _('Do not show in application menus.'))
         self._nodisplay_row.value_changed.connect(self._on_changed)
         self._fields['NoDisplay'] = self._nodisplay_row
-        opts_layout.addWidget(self._nodisplay_row)
+        opts_card.add_row(self._nodisplay_row)
 
-        self._directory_hide.append(opts_group)
-        scroll_layout.addWidget(opts_group)
+        self._directory_hide.append(opts_card)
+        scroll_layout.addWidget(opts_card)
 
         # ── Tabs: Categories / Actions / Advanced ─────────────────────
         self._tabs = QTabWidget()
@@ -235,16 +262,13 @@ class ApplicationEditor(QWidget):
         self._action_editor.value_changed.connect(self._on_changed)
         self._tabs.addTab(self._action_editor, _('Actions'))
 
-        adv_widget = QWidget()
-        adv_layout = QVBoxLayout(adv_widget)
-        adv_layout.setSpacing(4)
+        adv_card = _SectionCard(_('Advanced'))
         for key in ADVANCED_KEYS:
             row = _FieldRow(key, key)
             row.value_changed.connect(self._on_changed)
             self._fields[key] = row
-            adv_layout.addWidget(row)
-        adv_layout.addStretch()
-        self._tabs.addTab(adv_widget, _('Advanced'))
+            adv_card.add_row(row)
+        self._tabs.addTab(adv_card, _('Advanced'))
 
         scroll_layout.addWidget(self._tabs)
 
