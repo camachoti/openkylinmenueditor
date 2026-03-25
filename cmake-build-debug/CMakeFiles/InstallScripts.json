@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/camacho/git/openkylinmenueditor/cmake-build-debug/cmake_install.cmake",
+		"/home/camacho/git/openkylinmenueditor/cmake-build-debug/libukmge/cmake_install.cmake",
+		"/home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=OpenKylin Menu Editor
+Name[pt_BR]=Editor de Menus OpenKylin
+GenericName=Menu Editor
+GenericName[pt_BR]=Editor de Menus
+Comment=Edit application menus
+Comment[pt_BR]=Editar menus de aplicativos
+Exec=openkylinmenueditor
+Icon=openkylinmenueditor
+Categories=Settings;DesktopSettings;
+Keywords=menu;editor;launcher;desktop;
+StartupNotify=true

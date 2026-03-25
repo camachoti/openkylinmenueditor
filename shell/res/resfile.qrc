@@ -1,0 +1,23 @@
+<RCC>
+    <qresource prefix="/">
+        <file>i18n/en_US.ts</file>
+        <file>i18n/pt_BR.ts</file>
+        <file>qss/openkylinmenueditor.qss</file>
+        <file>icons/document-plus.svg</file>
+        <file>icons/folder-plus.svg</file>
+        <file>icons/document-plus.svg</file>
+        <file>icons/folder-plus.svg</file>
+        <file>icons/plus.svg</file>
+        <file>icons/chevron-up.svg</file>
+        <file>icons/chevron-down.svg</file>
+        <file>icons/minus.svg</file>
+        <file>icons/squares-2x2.svg</file>
+        <file>icons/x-mark.svg</file>
+        <file>icons/trash.svg</file>
+        <file>icons/window-close-symbolic.svg</file>
+        <file>icons/window-maximize-symbolic.svg</file>
+        <file>icons/window-minimize-symbolic.svg</file>
+        <file>icons/open-menu-symbolic.svg</file>
+        <file>icons/window-restore-symbolic.svg</file>
+    </qresource>
+</RCC>

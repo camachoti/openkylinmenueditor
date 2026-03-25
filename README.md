@@ -9,37 +9,39 @@ Additionally, MenuLibre provides an editor for the launcher actions
 used by applications such as Unity and Plank.
 
 ## Features
- - A beautiful interface powered by the latest version of GTK+
- - Create new launchers, or modify existing ones with complete control over common settings and access to advanced settings
- - Add, remove, and adjust desktop actions: powerful shortcuts available used by Unity, Xfce, and Pantheon
+ - Modern and high-performance interface powered by Qt (C++)
+ - Create or modify launchers with full FreeDesktop.org specification support
+ - Add, remove, and adjust desktop actions for advanced integration
  - Easily rearrange menu items to suit your needs
 
 ### Build Requirements
- - gir1.2-gtk-3.0
+ - Qt5/Qt6 development libraries
+ - C++17 compatible compiler
  - intltool
  - libgnome-menu-3-dev
- - python-gi-dev
- - python3
- - [python3-distutils-extra](https://launchpad.net/python-distutils-extra)
- - python3-psutil
 
 ### Runtime Requirements
- - gir1.2-gdkpixbuf-2.0 
- - gir1.2-glib-2.0
- - gir1.2-gmenu-3.0 
- - gir1.2-gtk-3.0 
- - gir1.2-gtksource-3.0
- - gnome-menus 
- - python3 
- - python3-gi
- - python3-psutil 
- - xdg-utils 
+ - Qt
+ - gnome-menus
+ - xdg-utils
+
 
 ## Installation
 
- 1. Install the above build requirements
- 2. Run the installer: \
-    sudo python3 setup.py install
+1. Install the build requirements above
+2. Compile via CMake (recomendado):
+   mkdir build && cd build
+   cmake ..
+   make
+
+   # Se o Qt não estiver no caminho padrão:
+   # cmake .. -DCMAKE_PREFIX_PATH=/caminho/para/Qt/6.x.x/gcc_64
+
+3. (Alternativo, build legado via qmake):
+   cd shell && qmake && make
+
+## Note:
+Esta versão é apenas C++/Qt. Todo o código Python foi removido do projeto.
 
 ## Links
  - [Homepage](https://bluesabre.org/openkylinmenueditor/)

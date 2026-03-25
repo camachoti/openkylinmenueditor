@@ -4,9 +4,5 @@ MANIFEST
 build/
 dist/
 menulibre.egg-info/
-menulibre/__pycache__/
-menulibre_lib/__pycache__/
 data/metainfo/menulibre.appdata.xml
 *~
-menulibre_qt/__pycache__
-menulibre_qt/__pycache__/

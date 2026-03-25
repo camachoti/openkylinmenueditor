@@ -1,0 +1,14 @@
+{
+    "appName": "openkylinmenueditor",
+    "displayName": "Menu Editor",
+    "version": "1.0.0",
+    "modules": [
+        {
+            "name": "menueditor",
+            "displayName": "Menu Editor",
+            "icon": "accessories-character-map",
+            "description": "Edit application menus",
+            "enabled": true
+        }
+    ]
+}
