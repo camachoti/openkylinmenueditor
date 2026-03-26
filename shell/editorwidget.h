@@ -1,5 +1,6 @@
 #pragma once
 #include <QWidget>
+#include "../backend/desktopfilehandler.h"
 
 class MenuTreeWidget;
 class ApplicationEditorWidget;
@@ -42,6 +43,7 @@ private slots:
     void onAddDirectory();
     void onAddSeparator();
     void onRemove();
+    void onCloneRequested(const DesktopEntry &entry);
 
 private:
     void buildUi();

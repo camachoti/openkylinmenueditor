@@ -51,7 +51,7 @@ public:
      * Creates parent directories as needed.
      * Returns true on success.
      */
-    static bool save(const DesktopEntry &entry, const QString &filePath = {});
+    static bool save(const DesktopEntry &entry, const QString &filePath = {}, QString *errorMsg = nullptr);
 
     /**
      * Remove a .desktop or .directory file, using pkexec for system paths if needed.

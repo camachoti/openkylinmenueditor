@@ -74,23 +74,45 @@ DesktopEntry DesktopFileHandler::load(const QString &filePath) {
     return entry;
 }
 
-bool DesktopFileHandler::save(const DesktopEntry &entry, const QString &filePath) {
+bool DesktopFileHandler::save(const DesktopEntry &entry, const QString &filePath, QString *errorMsg) {
+    qDebug() << "[DEBUG] ======== DesktopFileHandler::save ========";
+    qDebug() << "[DEBUG] filePath arg:" << filePath << ", entry.filePath:" << entry.filePath;
+
     QString outPath = filePath.isEmpty() ? entry.filePath : filePath;
-    if (outPath.isEmpty()) return false;
+    if (outPath.isEmpty()) {
+        qDebug() << "[DEBUG] Return false: outPath empty.";
+        if (errorMsg) *errorMsg = QObject::tr("No destination path specified.");
+        return false;
+    }
     // Try normal save first
     QSaveFile file(outPath);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "[DEBUG] QSaveFile open failed, error:" << file.errorString();
+        qDebug() << "[DEBUG] QSaveFile error enum:" << file.error();
+    }
+    if (file.isOpen()) {
         QTextStream out(&file);
         out << "[Desktop Entry]\n";
         for (auto it = entry.keys.constBegin(); it != entry.keys.constEnd(); ++it)
             out << it.key() << '=' << it.value() << "\n";
-        if (file.commit()) return true;
+        if (file.commit()) {
+            qDebug() << "[DEBUG] QSaveFile commit success!";
+            return true;
+        } else {
+            qDebug() << "[DEBUG] QSaveFile commit failed for:" << outPath << "err:" << file.errorString();
+            if (errorMsg) *errorMsg = QObject::tr("Failed to commit to file: ") + file.errorString();
+        }
     }
     // If failed and it's a system dir, try privilege escalation (pkexec cp)
     QFileInfo fi(outPath);
-    if (file.error() == QFile::PermissionsError || file.error() == QFileDevice::OpenError) {
+    if (file.error() != QFile::NoError) {
+        qDebug() << "[DEBUG] Falha de permissão, tentando pkexec.";
         QTemporaryFile tmpFile(QDir::tempPath() + "/XXXXXX.desktop");
-        if (!tmpFile.open()) return false;
+        if (!tmpFile.open()) {
+            qDebug() << "[DEBUG] Falha ao criar arquivo temporário para pkexec save.";
+            if (errorMsg) *errorMsg = QObject::tr("Could not create temporary file for privileged save.");
+            return false;
+        }
         QTextStream out(&tmpFile);
         out << "[Desktop Entry]\n";
         for (auto it = entry.keys.constBegin(); it != entry.keys.constEnd(); ++it)
@@ -99,33 +121,40 @@ bool DesktopFileHandler::save(const DesktopEntry &entry, const QString &filePath
         tmpFile.flush();
         tmpFile.close();
         QString tmpPath = tmpFile.fileName();
-        // Use pkexec to copy to target
+        // Use pkexec env ... cp to target (for polkit compatibility)
+        QString display = QString::fromLocal8Bit(qgetenv("DISPLAY"));
+        QString xauth = QString::fromLocal8Bit(qgetenv("XAUTHORITY"));
+        QString dbus = QString::fromLocal8Bit(qgetenv("DBUS_SESSION_BUS_ADDRESS"));
         QStringList args;
+        args << "env";
+        if (!display.isEmpty()) args << "DISPLAY=" + display;
+        if (!xauth.isEmpty()) args << "XAUTHORITY=" + xauth;
+        if (!dbus.isEmpty()) args << "DBUS_SESSION_BUS_ADDRESS=" + dbus;
         args << "cp" << tmpPath << outPath;
         QProcess proc;
-        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        if (!qgetenv("DISPLAY").isEmpty())
-            env.insert("DISPLAY", QString::fromLocal8Bit(qgetenv("DISPLAY")));
-        if (!qgetenv("XAUTHORITY").isEmpty())
-            env.insert("XAUTHORITY", QString::fromLocal8Bit(qgetenv("XAUTHORITY")));
-        proc.setProcessEnvironment(env);
+        qDebug() << "[PKEXEC DEBUG] Will run: pkexec" << args;
         proc.start("pkexec", args);
         bool started = proc.waitForStarted(5000);
         if (!started) {
-            qWarning("Could not start pkexec cp process");
-            qWarning("QProcess error: %d", (int)proc.error());
+            qDebug() << "[PKEXEC DEBUG] Could not start pkexec. QProcess error:" << proc.error();
+            if (errorMsg)
+                *errorMsg = QObject::tr("Could not start pkexec process. Error code: %1").arg((int)proc.error());
             QFile::remove(tmpPath);
+            qDebug() << "[DEBUG] Return false: pkexec did not start.";
             return false;
         }
-        proc.waitForFinished(-1);
+        bool finished = proc.waitForFinished(-1);
+        qDebug() << "[PKEXEC DEBUG] finished?" << finished << ", exitCode:" << proc.exitCode() << ", exitStatus:" << proc.exitStatus();
+        qDebug() << "[PKEXEC DEBUG] stderr:" << QString::fromUtf8(proc.readAllStandardError());
+        qDebug() << "[PKEXEC DEBUG] stdout:" << QString::fromUtf8(proc.readAllStandardOutput());
         QString stderrOut = QString::fromUtf8(proc.readAllStandardError());
         if (stderrOut.isEmpty()) stderrOut = QString::fromUtf8(proc.readAllStandardOutput());
         if (!(proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0)) {
-            if (!stderrOut.isEmpty())
-                qWarning() << "pkexec cp failed, stderr:" << stderrOut;
-            QFile::remove(tmpPath);
-            return false;
-        }
+    qDebug() << "[DEBUG] Return false: unknown file save failure.";
+    if (errorMsg)
+        *errorMsg = QObject::tr("Unknown file save failure.");
+    return false;
+}
         QFile::remove(tmpPath);
         return true;
     }

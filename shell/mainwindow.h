@@ -61,6 +61,9 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    // Aplica a máscara física de cantos arredondados do estilo Peony/UKUI.
+    // Usado somente no modo normal; maximizado/fullscreen remove (clearMask).
+    // Atenção: paintEvent garante aparência arredondada sempre, mesmo sem suporte a mask no sistema.
     void applyRoundedMask(int radius = 16);
 
 private:

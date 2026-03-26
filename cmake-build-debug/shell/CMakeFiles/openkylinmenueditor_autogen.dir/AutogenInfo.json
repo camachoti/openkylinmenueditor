@@ -7,9 +7,9 @@
 	"CMAKE_LIST_FILES" : 
 	[
 		"/home/camacho/git/openkylinmenueditor/shell/CMakeLists.txt",
-		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPkgConfig.cmake",
-		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPackageHandleStandardArgs.cmake",
-		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPackageMessage.cmake",
+		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPkgConfig.cmake",
+		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake",
+		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPackageMessage.cmake",
 		"/home/camacho/git/openkylinmenueditor/shell/res/resfile.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "/home/camacho/git/openkylinmenueditor",
@@ -152,7 +152,7 @@
 		"-w",
 		"-dM",
 		"-E",
-		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/CMakeCXXCompilerABI.cpp"
+		"/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/CMakeCXXCompilerABI.cpp"
 	],
 	"MOC_PREDEFS_FILE" : "/home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/openkylinmenueditor_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,

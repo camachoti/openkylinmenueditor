@@ -52,10 +52,12 @@ signals:
     void entryChanged(const QString &filePath);
     void saveRequested();
     void closeRequested();
+    void cloneRequested(const DesktopEntry &entry);
 
 private slots:
     void onIconButtonClicked();
     void onSave();
+    void onClone();
     void onFieldEdited();
 
 private:
@@ -83,6 +85,7 @@ private:
 
     QPushButton *m_saveBtn  = nullptr;
     QPushButton *m_closeBtn = nullptr;
+    QPushButton *m_cloneBtn = nullptr;
 
 
     DesktopEntry m_entry;

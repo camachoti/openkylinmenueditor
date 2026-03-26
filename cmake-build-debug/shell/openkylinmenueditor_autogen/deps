@@ -29,9 +29,9 @@ openkylinmenueditor_autogen/timestamp: \
 	/home/camacho/git/openkylinmenueditor/shell/searchbar.h \
 	/home/camacho/git/openkylinmenueditor/shell/titlewidget.cpp \
 	/home/camacho/git/openkylinmenueditor/shell/titlewidget.h \
-	/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPackageHandleStandardArgs.cmake \
-	/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPackageMessage.cmake \
-	/opt/clion/bin/cmake/linux/x64/share/cmake-4.1/Modules/FindPkgConfig.cmake \
+	/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPackageHandleStandardArgs.cmake \
+	/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPackageMessage.cmake \
+	/opt/clion/bin/cmake/linux/x64/share/cmake-4.2/Modules/FindPkgConfig.cmake \
 	/usr/include/alloca.h \
 	/usr/include/asm-generic/errno-base.h \
 	/usr/include/asm-generic/errno.h \

@@ -1,4 +1,5 @@
 #include "applicationeditorwidget.h"
+#include <QDebug>
 #include "../backend/desktopfilehandler.h"
 #include "../backend/xdgpaths.h"
 
@@ -183,7 +184,10 @@ void ApplicationEditorWidget::buildUi()
     m_saveBtn->setObjectName(QStringLiteral("save_btn"));
     m_saveBtn->setDefault(true);
     m_saveBtn->setEnabled(false);  // habilitado apenas quando houver alterações
+    m_cloneBtn = new QPushButton(tr("Clone"));
+    m_cloneBtn->setObjectName(QStringLiteral("clone_btn"));
     btnRow->addWidget(m_closeBtn);
+    btnRow->addWidget(m_cloneBtn);
     btnRow->addWidget(m_saveBtn);
     m_vlay->addLayout(btnRow);
     m_vlay->addStretch(1);
@@ -197,6 +201,7 @@ void ApplicationEditorWidget::buildUi()
     connect(m_noDisplayChk,   &QCheckBox::toggled,    this, &ApplicationEditorWidget::onFieldEdited);
     connect(m_saveBtn,  &QPushButton::clicked, this, &ApplicationEditorWidget::onSave);
     connect(m_closeBtn, &QPushButton::clicked, this, &ApplicationEditorWidget::closeRequested);
+    connect(m_cloneBtn, &QPushButton::clicked, this, &ApplicationEditorWidget::onClone);
 
     setWidget(m_content);
 }
@@ -304,6 +309,17 @@ void ApplicationEditorWidget::onSave()
     emit saveRequested();
 }
 
+void ApplicationEditorWidget::onClone()
+{
+    DesktopEntry entryCopy = m_entry;
+    entryCopy.filePath.clear();
+    QString originalName = m_entry.getString(QStringLiteral("Name"));
+    QString newName = originalName.isEmpty() ? QStringLiteral("Unnamed") : originalName + QStringLiteral("-copy");
+    entryCopy.setString(QStringLiteral("Name"), newName);
+    emit cloneRequested(entryCopy);
+}
+
+
 QString ApplicationEditorWidget::applyAndSave()
 {
     // Pull values from form into entry
@@ -345,14 +361,17 @@ QString ApplicationEditorWidget::applyAndSave()
             type);
     }
 
-    if (DesktopFileHandler::save(m_entry, savePath)) {
+    QString errorMsg;
+    if (DesktopFileHandler::save(m_entry, savePath, &errorMsg)) {
         m_entry.filePath = savePath;
         m_fileLbl->setText(savePath);
         emit entryChanged(savePath);
         return savePath;
     } else {
+        qDebug() << "[SAVE ERROR]" << errorMsg;
         QMessageBox::critical(this, tr("Save Failed"),
-            tr("Could not save the launcher. Try running as administrator or check your permissions."));
+            tr("Could not save the launcher. Try running as administrator or check your permissions.") +
+            (!errorMsg.trimmed().isEmpty() ? "\n\n" + errorMsg.trimmed() : ""));
         return {};
     }
 }

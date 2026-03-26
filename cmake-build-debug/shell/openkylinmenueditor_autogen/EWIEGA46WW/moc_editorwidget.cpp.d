@@ -1,5 +1,6 @@
 /home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/openkylinmenueditor_autogen/EWIEGA46WW/moc_editorwidget.cpp: /home/camacho/git/openkylinmenueditor/shell/editorwidget.h \
   /home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/openkylinmenueditor_autogen/moc_predefs.h \
+  /home/camacho/git/openkylinmenueditor/backend/desktopfilehandler.h \
   /usr/include/alloca.h \
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
@@ -254,6 +255,9 @@
   /usr/include/x86_64-linux-gnu/c++/12/bits/os_defines.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs-64.h \
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QMap \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QString \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QStringList \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qarraydata.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qatomic.h \
@@ -278,6 +282,7 @@
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qline.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qlist.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qlogging.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qmargins.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qnamespace.h \

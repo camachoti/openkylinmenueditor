@@ -341,18 +341,26 @@ void MainWindow::moveEvent(QMoveEvent *event)
     Q_EMIT posChanged();
 }
 
+//
+// Mascara física de cantos arredondados estilo Peony/UKUI:
+// - Aplica setMask(QRegion...) (arredondado) só no estado normal (nem maximizado, nem fullscreen)
+// - Remove mask (clearMask) em maximizado OU fullscreen, para ficar com cantos retos exatos de Peony
+// - O visual (paintEvent) sempre desenha arredondado para fallback
+// - Se o sistema ignora mask (X11 antigo/Wayland), aparência continua ok, mas interação nas bordas/cantos será quadrada
+//   (usuário verá arredondado, mas poderá clicar "fora" da forma física)
+//
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    // Em modo maximizado, remover arredondamento (cantos retos)
-    // Fallback: se ambiente não suporta compositor ou mascara (X11 antigo/Wayland), os cantos podem não funcionar
-    // Nesses casos, ao menos o visual estará correto pelo paintEvent, mas a interação física será quadrada.
-    if (isMaximized()) {
+    // Remove mask físico se maximizado ou fullscreen;
+    // Aplica rounded mask apenas em modo normal.
+    if (isMaximized() || isFullScreen()) {
         clearMask();
     } else {
         applyRoundedMask(16);
     }
 }
+
 
 
 void MainWindow::switchToEditor()

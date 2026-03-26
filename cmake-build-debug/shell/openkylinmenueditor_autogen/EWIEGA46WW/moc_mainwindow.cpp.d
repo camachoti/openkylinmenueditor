@@ -1,5 +1,6 @@
 /home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/openkylinmenueditor_autogen/EWIEGA46WW/moc_mainwindow.cpp: /home/camacho/git/openkylinmenueditor/shell/mainwindow.h \
   /home/camacho/git/openkylinmenueditor/cmake-build-debug/shell/openkylinmenueditor_autogen/moc_predefs.h \
+  /home/camacho/git/openkylinmenueditor/backend/desktopfilehandler.h \
   /home/camacho/git/openkylinmenueditor/libukmge/libukmge_global.h \
   /home/camacho/git/openkylinmenueditor/libukmge/widgets/CloseButton/closebutton.h \
   /home/camacho/git/openkylinmenueditor/shell/editorwidget.h \
@@ -269,7 +270,9 @@
   /usr/include/x86_64-linux-gnu/gnu/stubs.h \
   /usr/include/x86_64-linux-gnu/qt5/QGSettings/QGSettings \
   /usr/include/x86_64-linux-gnu/qt5/QGSettings/qgsettings.h \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QMap \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject \
+  /usr/include/x86_64-linux-gnu/qt5/QtCore/QString \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QStringList \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
   /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h \

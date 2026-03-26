@@ -59,9 +59,10 @@ void EditorWidget::buildUi()
             this,     &EditorWidget::onEntrySaved);
     connect(m_editor, &ApplicationEditorWidget::closeRequested,
             this, [this]() { m_stack->setCurrentIndex(0); });
+    connect(m_editor, &ApplicationEditorWidget::cloneRequested,
+            this, &EditorWidget::onCloneRequested);
     connect(m_tree, &MenuTreeWidget::reloadRequired,
             this, &EditorWidget::reloadMenu);
-
     // ── toolbar actions ──────────────────────────────────────────────
     connect(m_tree, &MenuTreeWidget::addLauncherRequested,
             this,   &EditorWidget::onAddLauncher);
@@ -71,6 +72,13 @@ void EditorWidget::buildUi()
             this,   &EditorWidget::onAddSeparator);
     connect(m_tree, &MenuTreeWidget::removeRequested,
             this,   &EditorWidget::onRemove);
+}
+
+void EditorWidget::onCloneRequested(const DesktopEntry &entry)
+{
+    m_editor->loadEntry(entry);
+    m_stack->setCurrentIndex(1);
+    m_editor->focusNameField();
 }
 
 void EditorWidget::loadMenu()
