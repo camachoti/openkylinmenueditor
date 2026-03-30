@@ -57,7 +57,7 @@ public:
      * Remove a .desktop or .directory file, using pkexec for system paths if needed.
      * Returns true on success.
      */
-    static bool remove(const QString &filePath);
+    static bool remove(const QString &filePath, QString *errorMsg = nullptr);
 
     /**
      * Return a new DesktopEntry pre-populated for a new Application launcher.

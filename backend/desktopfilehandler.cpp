@@ -180,20 +180,35 @@ DesktopEntry DesktopFileHandler::newDirectory(const QString &name) {
 
 
 // Remove a launcher file, with privilege fallback (pkexec) for system directories
-bool DesktopFileHandler::remove(const QString &filePath)
+bool DesktopFileHandler::remove(const QString &filePath, QString *errorMsg)
 {
-    if (filePath.isEmpty()) return false;
+    qDebug() << "[DEBUG] ======== DesktopFileHandler::remove ========";
+    qDebug() << "[DEBUG] filePath arg:" << filePath;
+
+    if (filePath.isEmpty()) {
+        qDebug() << "[DEBUG] Return false: filePath empty.";
+        if (errorMsg) *errorMsg = QObject::tr("No file path specified.");
+        return false;
+    }
 
     QFileInfo fi(filePath);
-    if (!fi.exists())
+    if (!fi.exists()) {
+        qDebug() << "[DEBUG] File does not exist, consider removed.";
         return true; // Already gone
+    }
 
     QFile f(filePath);
-    if (f.remove())
+    if (f.remove()) {
+        qDebug() << "[DEBUG] QFile::remove success!";
         return true;
+    } else {
+        qDebug() << "[DEBUG] QFile::remove failed, error:" << f.errorString();
+        qDebug() << "[DEBUG] QFile error enum:" << f.error();
+    }
 
     // If permission denied (system dir), try pkexec rm
-    if (f.error() == QFile::PermissionsError || f.error() == QFileDevice::OpenError) {
+    if (f.error() != QFile::NoError) {
+        qDebug() << "[DEBUG] Falha de permissão, tentando pkexec para remoção.";
         // Compose env-invocation inline to pkexec for maximal session compatibility
         QString display = QString::fromLocal8Bit(qgetenv("DISPLAY"));
         QString xauth = QString::fromLocal8Bit(qgetenv("XAUTHORITY"));
@@ -205,19 +220,24 @@ bool DesktopFileHandler::remove(const QString &filePath)
         if (!dbus.isEmpty()) args << "DBUS_SESSION_BUS_ADDRESS=" + dbus;
         args << "rm" << "-f" << filePath;
         QProcess proc;
+        qDebug() << "[PKEXEC DEBUG] Will run: pkexec" << args;
         proc.start("pkexec", args);
         bool started = proc.waitForStarted(5000);
         if (!started) {
-            qWarning("Could not start pkexec process");
-            qWarning("QProcess error: %d", (int)proc.error());
+            qDebug() << "[PKEXEC DEBUG] Could not start pkexec. QProcess error:" << proc.error();
+            if (errorMsg)
+                *errorMsg = QObject::tr("Could not start pkexec process. Error code: %1").arg((int)proc.error());
+            qDebug() << "[DEBUG] Return false: pkexec did not start.";
             return false;
         }
-        proc.waitForFinished(-1);
+        bool finished = proc.waitForFinished(-1);
+        qDebug() << "[PKEXEC DEBUG] finished?" << finished << ", exitCode:" << proc.exitCode() << ", exitStatus:" << proc.exitStatus();
+        qDebug() << "[PKEXEC DEBUG] stderr:" << QString::fromUtf8(proc.readAllStandardError());
+        qDebug() << "[PKEXEC DEBUG] stdout:" << QString::fromUtf8(proc.readAllStandardOutput());
         if (!(proc.exitStatus() == QProcess::NormalExit && proc.exitCode() == 0)) {
-            QString stderrOut = QString::fromUtf8(proc.readAllStandardError());
-            if (stderrOut.isEmpty()) stderrOut = QString::fromUtf8(proc.readAllStandardOutput());
-            if (!stderrOut.isEmpty())
-                qWarning() << "pkexec rm failed, stderr:" << stderrOut;
+            qDebug() << "[DEBUG] Return false: unknown file remove failure.";
+            if (errorMsg)
+                *errorMsg = QObject::tr("Unknown file remove failure.");
             return false;
         }
         return true;

@@ -252,10 +252,12 @@ void EditorWidget::onRemove()
             QMessageBox::No);
         if (sysReply != QMessageBox::Yes) return;
         // Try privileged removal using DesktopFileHandler
-        if (!DesktopFileHandler::remove(filename)) {
+        QString errorMsg;
+        if (!DesktopFileHandler::remove(filename, &errorMsg)) {
             QMessageBox::warning(this,
                 tr("Failed to remove system launcher"),
-                tr("Could not remove the system launcher. Try running as administrator."));
+                tr("Could not remove the system launcher. Try running as administrator.") +
+                (!errorMsg.trimmed().isEmpty() ? "\n\n" + errorMsg.trimmed() : ""));
             return;
         }
     }
