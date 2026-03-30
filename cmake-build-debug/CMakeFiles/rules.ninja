@@ -33,7 +33,7 @@ rule CXX_COMPILER__ukmge_unscanned_Debug
 # Rule for linking CXX static library.
 
 rule CXX_STATIC_LIBRARY_LINKER__ukmge_Debug
-  command = $PRE_LINK && /opt/clion/bin/cmake/linux/x64/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
+  command = $PRE_LINK && /home/camacho/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CXX static library $TARGET_FILE
   restat = $RESTAT
 
@@ -63,7 +63,7 @@ rule CXX_EXECUTABLE_LINKER__openkylinmenueditor_Debug
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /opt/clion/bin/cmake/linux/x64/bin/cmake --regenerate-during-build -S/home/camacho/git/openkylinmenueditor -B/home/camacho/git/openkylinmenueditor/cmake-build-debug
+  command = /home/camacho/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake --regenerate-during-build -S/home/camacho/git/openkylinmenueditor -B/home/camacho/git/openkylinmenueditor/cmake-build-debug
   description = Re-running CMake...
   generator = 1
 
@@ -72,7 +72,7 @@ rule RERUN_CMAKE
 # Rule for cleaning additional files.
 
 rule CLEAN_ADDITIONAL
-  command = /opt/clion/bin/cmake/linux/x64/bin/cmake -DCONFIG=$CONFIG -P CMakeFiles/clean_additional.cmake
+  command = /home/camacho/.local/share/JetBrains/Toolbox/apps/clion/bin/cmake/linux/x64/bin/cmake -DCONFIG=$CONFIG -P CMakeFiles/clean_additional.cmake
   description = Cleaning additional files...
 
 
@@ -80,7 +80,7 @@ rule CLEAN_ADDITIONAL
 # Rule for cleaning all built files.
 
 rule CLEAN
-  command = /opt/clion/bin/ninja/linux/x64/ninja $FILE_ARG -t clean $TARGETS
+  command = /home/camacho/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja $FILE_ARG -t clean $TARGETS
   description = Cleaning all built files...
 
 
@@ -88,6 +88,6 @@ rule CLEAN
 # Rule for printing all primary targets available.
 
 rule HELP
-  command = /opt/clion/bin/ninja/linux/x64/ninja -t targets
+  command = /home/camacho/.local/share/JetBrains/Toolbox/apps/clion/bin/ninja/linux/x64/ninja -t targets
   description = All primary targets available:
 
